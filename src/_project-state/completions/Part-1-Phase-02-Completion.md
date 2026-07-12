@@ -75,8 +75,8 @@ The brief pre-specified D-1.02-1..5 (appended verbatim to `Decisions.md`). The f
 - **New:** `sanity/` (standalone Studio: `package.json`, `package-lock.json`, `.gitignore`, `sanity.cli.ts`, `sanity.config.ts`, `tsconfig.json`, `schemaTypes/{index,provenance,season,person,story,page}.ts`); `lib/sanity/{client,queries,sanity.types}.ts`; `app/api/revalidate/route.ts`; `scripts/check-verified-gate.mjs`; `.env.example`; `briefs/Part-1-Phase-02-Code.md`; this report.
 - **Edited:** `package.json` (+`next-sanity`, `typegen`/`check:gate` scripts), `package-lock.json`, `tsconfig.json` (exclude `sanity`), `eslint.config.mjs` (ignore `sanity/**`); state files; `Decisions.md`. **Deleted:** `lib/.gitkeep` (dir now has content).
 - **Sanity (not in repo):** project `f8rmnfry` in org `obJ2FYA4n`; datasets `production`/`test` (private); Studio https://belasica.sanity.studio/; webhook `revalidate-nextjs`; CORS `localhost:3333`/`localhost:3000`/`belasica.vercel.app`.
-- **PR:** [PLACEHOLDER: PR URL — added on push]
-- **Preview URL:** [PLACEHOLDER: Vercel preview URL — added on push]
+- **PR:** https://github.com/DinovLazar/belasica/pull/2 (open, unmerged — Lazar merges)
+- **Preview URL (team-protected):** https://belasica-git-phase-102-sanity-dinovlazars-projects.vercel.app
 - **Secrets:** `SANITY_API_READ_TOKEN` (Viewer) + `SANITY_REVALIDATE_SECRET` live only in `.env.local` (git-ignored) and Vercel. Nothing secret in the repo.
 
 ## 6. State updates done
