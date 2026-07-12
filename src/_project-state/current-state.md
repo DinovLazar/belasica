@@ -1,4 +1,4 @@
-NEXT: Part 1 · Phase 1.02 — Sanity foundation (Code)
+NEXT: Part 1 · Phase 1.03 — Design exploration (Design)
 
 # current-state.md — Belasica
 
@@ -7,21 +7,27 @@ NEXT: Part 1 · Phase 1.02 — Sanity foundation (Code)
 
 ## Summary (plain language)
 
-- Works now: a public GitHub repo with a Next.js 16 project that builds and lints cleanly, and a single placeholder homepage that loads on Vercel. Every branch push gets its own preview link; `main` is production.
-- Stubbed / not wired yet: everything else — no content, no design/brand, no Sanity, no components, no real club facts. The homepage shows a deliberate placeholder for the club name and "Сајтот е во изградба."
-- Current phase just closed: Part 1 · Phase 1.01 — Scaffold. Next up: Sanity foundation (1.02).
+- Works now: the public repo builds and lints cleanly with the same placeholder homepage, **plus a full content home in Sanity**. There is a real place to enter seasons, people and stories — a deployed editing Studio at https://belasica.sanity.studio/ — and the site's truth rules are now enforced by the system: every document must name its Drive source, and the website can only ever read documents a human has marked `verified`.
+- Stubbed / not wired yet: no design/brand (still SEED), no components, no rendered content pages — the Sanity data layer exists but nothing renders it yet (that starts at 1.04/1.05). No real club content has been entered; `production` holds zero content documents by design.
+- Current phase just closed: Part 1 · Phase 1.02 — Sanity foundation (Code). Next up: Design exploration (1.03).
 
 ## Detail
 
-- **Stack (pinned exact):** Next.js 16.2.10, React 19.2.4, react-dom 19.2.4, TypeScript 5.9.3, Tailwind v4.3.2 (`@tailwindcss/postcss` 4.3.2), ESLint 9.39.5 (`eslint-config-next` 16.2.10). Node 22.23.1 (`.nvmrc`). Versions logged in `00_stack-and-config.md`.
-- **Layout:** flat — `app/`, `components/` (empty, `.gitkeep`), `lib/` (empty, `.gitkeep`) at repo root. `src/` holds only `_project-state/`.
-- **Routes:** `/` (static) renders the placeholder page; `app/layout.tsx` sets `<html lang="mk">` and metadata title `Белазица — архива`. No other routes.
-- **Design/brand:** none. `brand.md` is still SEED; shadcn/ui + lucide-react deferred to 1.04 (see `Decisions.md` D-1.01-1). Fonts intentionally not chosen (D-1.01-4).
-- **Content:** none in the repo by design — all content/photos live in Sanity, wired at 1.02. `facts.md` has no VERIFIED club-level facts yet.
-- **Vercel:** project `belasica` on team `dinovlazars-projects`, GitHub repo connected (auto-deploy `main` → production; every branch → preview). Verified via `vercel git connect` ("already connected").
-  - Branch preview URL (phase-1.01-scaffold): https://belasica-git-phase-101-scaffold-dinovlazars-projects.vercel.app — **team-protected** (Vercel Authentication, the platform default): loads for anyone signed into the `dinovlazars-projects` team (i.e. Lazar). Anonymous visitors are redirected to Vercel login. See `Decisions.md` D-1.01-6.
-  - Production alias: https://belasica.vercel.app — **public**, returns 200 and serves the same placeholder (title `Белазица — архива`, `lang="mk"`, both lines). Updates when `main` deploys on merge.
-- **CI:** none, by owner decision (D-0.00-6). Review gate = Vercel preview + completion report; Lazar merges.
+- **Stack (pinned exact):** Next.js 16.2.10, React 19.2.4, react-dom 19.2.4, TypeScript 5.9.3, Tailwind v4.3.2, ESLint 9.39.5. **Added 1.02:** `next-sanity@13.1.1` (app). Standalone Studio package `sanity/`: `sanity@6.4.0`, `@sanity/vision@6.4.0`, `styled-components@6.4.3`. Node 22.23.1. All exact-pinned; versions logged in `00_stack-and-config.md`.
+- **Layout:** flat — `app/`, `components/` (empty), `lib/` (now holds the Sanity data layer) at root; `src/` holds only `_project-state/`. **New top-level `sanity/`** = standalone Studio package (own `package.json`/lockfile/`node_modules`, excluded from the app's `tsconfig`/ESLint — D-1.02-1). **New `scripts/`** = the gate-proof script.
+- **Routes:** `/` (static, unchanged placeholder), `/_not-found` (static), and **`/api/revalidate`** (dynamic) — the Sanity webhook target. `app/page.tsx` is byte-identical to `main`.
+- **Sanity:**
+  - Project `belasica` = **`f8rmnfry`**, in a dedicated org **"Belasica"** (`obJ2FYA4n`), free tier (D-1.02-7). Two **private** datasets: `production` (live content) and `test` (gate proof only, D-1.02-5).
+  - **Studio** (`sanity/`) deployed at **https://belasica.sanity.studio/**; runs locally via `npm run dev` in `sanity/` on :3333. Four document types — `season`, `person`, `story`, `page` — each with required identity fields, a required `source`, and a `verified` boolean defaulting to **false**. Editor labels/descriptions are Macedonian; field names stay English. Every type has a Studio preview showing verified state (`✓ Проверено` / `● Непроверено — скриено`).
+  - **Data layer** in `lib/sanity/`: `client.ts` (env-driven, `apiVersion` pinned `2026-01-01`, `useCdn: true`, server-only read token), `queries.ts` (5 queries via `defineQuery`, all composing the exported `VERIFIED_FILTER` = `` `verified == true` ``; tagged fetchers matching the webhook), `sanity.types.ts` (generated by TypeGen, committed).
+  - **Revalidation:** `app/api/revalidate/route.ts` verifies the webhook signature against `SANITY_REVALIDATE_SECRET` (401 on bad/absent signature) and calls `revalidateTag(tag, { expire: 0 })`. A GROQ webhook `revalidate-nextjs` (id `xONt89WhvE9s0bCa`) is registered → POSTs to `https://belasica.vercel.app/api/revalidate` on create/update/delete of the four types, projecting `{_type, slug}`.
+  - **CORS origins:** `http://localhost:3333` (Studio), `http://localhost:3000` (Next dev), `https://belasica.vercel.app` (prod).
+  - **Verified-gate proof:** `npm run check:gate` creates a verified + an unverified season in `test`, runs the real query, asserts only the verified one returns, deletes both. Passes (exit 0).
+- **Secrets:** `SANITY_API_READ_TOKEN` (Viewer role) and `SANITY_REVALIDATE_SECRET` live in `.env.local` (git-ignored) and in Vercel (Production, Preview, Development). `.env.example` (committed) lists the four variable names only. `NEXT_PUBLIC_SANITY_PROJECT_ID`/`_DATASET` are non-secret.
+- **Design/brand:** none. `brand.md` still SEED; shadcn/ui + lucide-react still deferred to 1.04 (D-1.01-1); locks at 1.03.
+- **Content:** none in the repo (code only). `production` has **0 content documents** (only Sanity's own `_.**` system docs). `facts.md` has no VERIFIED club facts yet.
+- **Vercel:** project `belasica` on `dinovlazars-projects`; `main` → production, every branch → preview (previews team-protected, D-1.01-6).
+- **CI:** none (D-0.00-6). Review gate = Vercel preview + completion report; Lazar merges.
 
 ## Placeholder register
 
@@ -37,8 +43,11 @@ NEXT: Part 1 · Phase 1.02 — Sanity foundation (Code)
 
 | Item | Owed by | Since phase |
 |---|---|---|
-| Lazar opens the Phase 1.01 PR preview URL and confirms the homepage loads | Lazar | 1.01 |
+| Open the deployed Studio (https://belasica.sanity.studio/), sign in, confirm the four document types show Macedonian labels and a new Season has `verified` **off** by default | Lazar | 1.02 |
+| Open this PR's Vercel preview, confirm the homepage still loads unchanged, then merge the PR | Lazar | 1.02 |
 
 ## Known issues
 
-- None recorded.
+- `production` shows 13 documents to `count(*[])`, but all are Sanity **system** documents under the reserved `_.**` path (11 access groups, 1 retention policy, 1 schema manifest from `sanity deploy`) — **zero content documents**. Every dataset has these.
+- `npm run check:gate` prints a benign Node `MODULE_TYPELESS_PACKAGE_JSON` warning (it imports a `.ts` query into a `.mjs` script); the proof still passes with exit 0.
+- Studio dependency install shows peer-dependency override warnings (Sanity 6 + React 19) and 10 moderate transitive-dep advisories; `npm audit fix --force` deliberately not run (it would break exact pins).

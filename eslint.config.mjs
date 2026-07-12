@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone Sanity Studio — its own package with its own toolchain (D-1.02-1).
+    "sanity/**",
   ]),
 ]);
 

@@ -108,3 +108,76 @@
 - **Alternatives considered:** Disable Deployment Protection to make previews publicly loadable — not done unprompted: it is a security-setting change the brief did not request. Low-risk to enable later (the site is public, no secrets), so it is offered to Lazar as a toggle rather than applied. Path: Vercel → Project `belasica` → Settings → Deployment Protection.
 - **Consequences:** Preview URLs require Vercel team login. Homepage content is independently verified as correct via the public production URL (200 + exact two lines + `lang="mk"` + title) and local `next build`. Owed-verification item (Lazar loads the preview) is satisfied by his authenticated session.
 - **Links:** Phase 1.01 brief §Tasks 7 & Owed-to-Lazar, `current-state.md`.
+
+### D-1.02-1 · 2026-07-12 · Standalone Studio in `sanity/`, not embedded in Next.js
+- **Status:** Accepted (brief-specified).
+- **Decision:** The Sanity Studio is its own npm package under `sanity/` with its own `package.json`, deployed to Sanity's hosted Studio (`belasica.sanity.studio`). It is excluded from the Next.js app's `tsconfig`/ESLint and is not compiled by `next build`.
+- **Alternatives rejected:** The embedded `/app/studio/[[...tool]]` route — it recompiles the whole Studio through `next build` on every deploy, blocks Studio auto-updates, and puts a CMS route on a site that must hold Lighthouse 95+.
+- **Consequences:** Two `package.json`/lockfiles in the repo; `sanity/` runs its own `npm install`. `npm create sanity` was declined (it tries to switch to the embedded flow); the package was hand-written.
+- **Links:** Phase 1.02 brief, `sanity/`, `tsconfig.json`, `eslint.config.mjs`.
+
+### D-1.02-2 · 2026-07-12 · Private datasets + a server-only read token (owner call)
+- **Status:** Accepted (brief-specified; owner call, Lazar).
+- **Decision:** Both datasets (`production`, `test`) are private. Reads use a Viewer-role token that lives only in `.env.local` and Vercel env vars — never in the repo.
+- **Reason:** The repo is public and the material is Ace's unpublished research; a public dataset would let anyone with the project ID read every unverified draft.
+- **Consequences:** The read token can read unverified drafts, so it must stay server-only (no `NEXT_PUBLIC_` prefix). Site safety comes from the `verified == true` query gate, not from the token's scope.
+- **Links:** Phase 1.02 brief, `lib/sanity/client.ts`, `.env.example`, [[D-1.02-7]].
+
+### D-1.02-3 · 2026-07-12 · Static-first with tag-based revalidation; no Live Content API in Part 1
+- **Status:** Accepted (brief-specified).
+- **Decision:** Pages are statically generated and refreshed by a Sanity webhook hitting `app/api/revalidate`. `defineLive`/`SanityLive`/Visual Editing/Presentation/draft mode are not used.
+- **Reason:** The archive changes rarely and must hit Lighthouse 95+.
+- **Consequences:** `next-sanity@13` pulls `@sanity/visual-editing` in *transitively*, but nothing imports it — "not installed" is honoured at the usage level. Revisit only if Ace needs live preview while editing.
+- **Links:** Phase 1.02 brief, `app/api/revalidate/route.ts`, [[D-1.02-9]].
+
+### D-1.02-4 · 2026-07-12 · Schemas ship identity + provenance only
+- **Status:** Accepted (brief-specified).
+- **Decision:** `season`/`person`/`story`/`page` carry identity fields + `source` + `verified` only. Results, tables, squads, scorers and photo fields are not modelled yet.
+- **Reason:** The real shape of the archive is unknown until Ace's Drive is surveyed (parallel track P2); modelling it blind guarantees a rewrite.
+- **Consequences:** Season/person schemas are extended at 1.05–1.06 against real Drive material; photos at 2.05.
+- **Links:** Phase 1.02 brief, `sanity/schemaTypes/`.
+
+### D-1.02-5 · 2026-07-12 · A second dataset `test` exists purely to prove the verified-gate
+- **Status:** Accepted (brief-specified).
+- **Decision:** The `test` dataset exists only so the gate proof (`scripts/check-verified-gate.mjs`) can create throwaway documents and delete them. No fabricated content ever enters `production`.
+- **Consequences:** The gate proof writes to `test` only (hard-coded), and cleans up after itself. `production` holds zero content documents.
+- **Links:** Phase 1.02 brief, `scripts/check-verified-gate.mjs`, [[D-1.02-8]].
+
+### D-1.02-6 · 2026-07-12 · Claude ran the merge of PR #1 — one-time explicit owner override
+- **Status:** Accepted — owner call, does **not** supersede the standing rule.
+- **Context:** Phase 1.02's gate requires Phase 1.01 merged into `main`. PR #1 was still open. CLAUDE.md (§Branch & PR) and D-0.00-6 say **Claude never merges its own PR** — Lazar reviews the preview and merges.
+- **Decision:** After flagging the rule, Lazar explicitly instructed Claude to run the merge; Claude merged PR #1 into `main` (merge commit `4e26dd1`) and deleted the branch. This was a one-off override for this specific PR.
+- **Alternatives rejected:** Lazar merges it himself (the rule-compliant path) — Lazar chose to have Claude do it via a confirmation prompt.
+- **Consequences:** The "never merge your own PR" rule remains in force for all future PRs, including this phase's. Recorded here for the audit trail because it deviates from a bolded rule.
+- **Links:** CLAUDE.md §Branch & PR rules, [[D-0.00-6]], PR #1.
+
+### D-1.02-7 · 2026-07-12 · Dedicated "Belasica" Sanity organization (kept off the client org)
+- **Status:** Accepted — owner call (Lazar chose via prompt).
+- **Context:** The Sanity account had **no** personal organization — only the client org "Sunset Services" (7 members). Every Sanity project must belong to an org, and org admins can reach projects in their org, so where `belasica` lives is a privacy boundary for Ace's private research ([[D-1.02-2]]).
+- **Decision:** Created a new organization **"Belasica"** (`obJ2FYA4n`) and created project `belasica` (`f8rmnfry`) under it. Mirrors [[D-1.01-5]] (belasica on the personal Vercel scope, not the client team).
+- **Alternatives rejected:** Put belasica in the "Sunset Services" org — exposes private research to the client org's admins/members. Org-less project — not allowed by Sanity.
+- **Consequences:** belasica is isolated from the client org; Lazar is the sole org member. Free tier.
+- **Links:** Phase 1.02 brief §Tasks 2, [[D-1.01-5]], [[D-1.02-2]].
+
+### D-1.02-8 · 2026-07-12 · Gate proof writes with the local Sanity CLI session, not a stored write token
+- **Status:** Accepted (self-made; brief did not specify the gate's write credential).
+- **Context:** The app's read token is Viewer-only and cannot create/delete, so the gate proof needs write access to `test`. The brief's env list has no write token.
+- **Decision:** `scripts/check-verified-gate.mjs` uses `SANITY_API_WRITE_TOKEN` if set, otherwise falls back to the local Sanity CLI session token (`~/.config/sanity/config.json`, from `npx sanity login`). No write token is committed or added to Vercel; `.env.example` keeps exactly the four brief-named variables.
+- **Alternatives rejected:** Create an Editor token and add a 5th env var to `.env.example`/Vercel — more secret sprawl for a local-only proof; there is no CI on this repo (D-0.00-6).
+- **Consequences:** `npm run check:gate` runs wherever a `sanity login` exists (the intended local-dev context); it fails with a clear message otherwise. The script hard-codes `dataset: 'test'`, so production is never touched.
+- **Links:** Phase 1.02 brief §Tasks (gate), [[D-1.02-5]], `scripts/check-verified-gate.mjs`.
+
+### D-1.02-9 · 2026-07-12 · Next.js 16 cache-API + Sanity webhook-API adaptations
+- **Status:** Accepted (self-made; forced by current API shapes the brief predates).
+- **Context:** Two APIs had changed from what a naïve implementation assumes.
+- **Decision:** (a) **Revalidation:** Next 16's `revalidateTag` now requires a second argument; the route uses `revalidateTag(tag, { expire: 0 })` — the documented pattern for an external webhook needing immediate expiration (`updateTag` is Server-Action-only and unusable in a route handler). (b) **Webhook registration:** `sanity hooks create` only opens a browser, so the GROQ webhook was registered via the management API (`v2025-08-04`, `type: "document"`, with `on`/`filter`/`projection` nested under `rule`), verified by `sanity hooks list`.
+- **Alternatives rejected:** `revalidateTag(tag, 'max')` (stale-while-revalidate) — for a webhook we want immediate expiry. Registering the webhook by hand in the browser — not reproducible from this session.
+- **Consequences:** Revalidation behaviour is exercised only when pages render (1.04+); the wiring and 401-on-bad-signature are proven now.
+- **Links:** Phase 1.02 brief §Tasks (revalidation/webhook), `app/api/revalidate/route.ts`, [[D-1.02-3]].
+
+### D-1.02-10 · 2026-07-12 · Studio deploy pinned for reproducibility; API version pinned
+- **Status:** Accepted (self-made).
+- **Decision:** In `sanity.cli.ts`, Studio auto-updates are **off** (`deployment.autoUpdates: false`) and the deployed app is pinned (`deployment.appId: 'q93d4lfwpetxz05s17ulprtb'`), so deploys track the exact pinned `sanity` version and don't re-prompt. The client/query `apiVersion` is pinned to the fixed date `'2026-01-01'`.
+- **Reason:** Matches the repo's exact-pinning philosophy (CLAUDE.md); a floating Studio runtime or `apiVersion` would break reproducibility.
+- **Consequences:** Studio upgrades are deliberate (bump the pin + redeploy). Studio deployed at https://belasica.sanity.studio/.
+- **Links:** Phase 1.02 brief §Tasks (deploy), `sanity/sanity.cli.ts`, `lib/sanity/client.ts`, [[D-1.01-1]].

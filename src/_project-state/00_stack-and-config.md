@@ -30,3 +30,23 @@ Scaffolded with `create-next-app@latest`, then every dependency stripped to an e
 - `@types/react@19.2.17`
 - `@types/react-dom@19.2.3`
 - Not installed this phase (per D-1.01-1): shadcn/ui + lucide-react → deferred to 1.04.
+
+## 2026-07-12 — Phase 1.02 install: Sanity foundation (exact pinned versions, as shipped)
+All pins exact (no `^`/`~`/`latest`). Two packages now: the Next.js app (repo root) and the standalone Studio (`sanity/`, own `package.json`/lockfile — D-1.02-1).
+
+Next.js app (root `package.json`) — added:
+- `next-sanity@13.1.1` (dependency) — Sanity client + `defineQuery` + `next-sanity/webhook` `parseBody` for the revalidation route.
+  - Brings transitively (not direct deps): `@sanity/client@7.23.0`, `groq@6.4.0`, and `sanity@6.4.0`; also `@sanity/visual-editing@5.4.5` — **not imported** (D-1.02-3).
+- Scripts added: `typegen` (`npm --prefix sanity run typegen`), `check:gate` (`node --env-file=.env.local scripts/check-verified-gate.mjs`).
+
+Standalone Studio (`sanity/package.json`):
+- `sanity@6.4.0`, `@sanity/vision@6.4.0`, `styled-components@6.4.3`, `react@19.2.4`, `react-dom@19.2.4`
+- dev: `typescript@5.9.3`, `@types/react@19.2.17`, `@types/react-dom@19.2.3`
+- CLI used for project/dataset/schema/typegen/deploy: `@sanity/cli@7.7.1` (bundled with `sanity`).
+
+Sanity project (not a dependency, but the config authority):
+- Project `belasica` = **`f8rmnfry`**, in org **"Belasica"** (`obJ2FYA4n`), free tier (D-1.02-7).
+- Datasets: `production` (private), `test` (private).
+- API version pinned (client + queries + webhook GROQ): `2026-01-01` (D-1.02-10).
+- Studio deployed: https://belasica.sanity.studio/ (appId `q93d4lfwpetxz05s17ulprtb`, autoUpdates off).
+- Read token: Viewer role, in `.env.local` + Vercel only (never the repo).
