@@ -100,3 +100,11 @@
 - **Alternatives considered:** `sunset-services-team` — rejected: unrelated client team.
 - **Consequences:** GitHub repo connected under this scope; `main` → production, every branch → preview. Also added `.claude/` to `.gitignore` (public-repo hygiene: keeps local agent tooling out of the repo).
 - **Links:** Phase 1.01 brief §Tasks 7, `current-state.md`.
+
+### D-1.01-6 · 2026-07-12 · Vercel preview deployments kept team-protected (platform default)
+- **Status:** Accepted
+- **Context:** Vercel Pro enables Deployment Protection (Vercel Authentication) on preview deployments by default. The branch preview alias 302-redirects anonymous visitors to Vercel SSO login; it loads only for users signed into the `dinovlazars-projects` team. Production (`belasica.vercel.app`) is public and unaffected.
+- **Decision:** Leave the default ON — do not change the account's security posture unprompted. Lazar is the sole reviewer (D-0.00-6) and is a team member, so the PR preview link loads for him via SSO; the review workflow is unaffected.
+- **Alternatives considered:** Disable Deployment Protection to make previews publicly loadable — not done unprompted: it is a security-setting change the brief did not request. Low-risk to enable later (the site is public, no secrets), so it is offered to Lazar as a toggle rather than applied. Path: Vercel → Project `belasica` → Settings → Deployment Protection.
+- **Consequences:** Preview URLs require Vercel team login. Homepage content is independently verified as correct via the public production URL (200 + exact two lines + `lang="mk"` + title) and local `next build`. Owed-verification item (Lazar loads the preview) is satisfied by his authenticated session.
+- **Links:** Phase 1.01 brief §Tasks 7 & Owed-to-Lazar, `current-state.md`.

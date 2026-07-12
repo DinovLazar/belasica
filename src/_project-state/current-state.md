@@ -18,9 +18,9 @@ NEXT: Part 1 · Phase 1.02 — Sanity foundation (Code)
 - **Routes:** `/` (static) renders the placeholder page; `app/layout.tsx` sets `<html lang="mk">` and metadata title `Белазица — архива`. No other routes.
 - **Design/brand:** none. `brand.md` is still SEED; shadcn/ui + lucide-react deferred to 1.04 (see `Decisions.md` D-1.01-1). Fonts intentionally not chosen (D-1.01-4).
 - **Content:** none in the repo by design — all content/photos live in Sanity, wired at 1.02. `facts.md` has no VERIFIED club-level facts yet.
-- **Vercel:** project `belasica` on team `dinovlazars-projects`, GitHub repo connected (auto-deploy `main` → production; every branch → preview).
-  - Branch preview URL (phase-1.01-scaffold): https://belasica-git-phase-1-01-scaffold-dinovlazars-projects.vercel.app
-  - Production alias: https://belasica.vercel.app (currently serves the same placeholder; will update when `main` deploys on merge).
+- **Vercel:** project `belasica` on team `dinovlazars-projects`, GitHub repo connected (auto-deploy `main` → production; every branch → preview). Verified via `vercel git connect` ("already connected").
+  - Branch preview URL (phase-1.01-scaffold): https://belasica-git-phase-101-scaffold-dinovlazars-projects.vercel.app — **team-protected** (Vercel Authentication, the platform default): loads for anyone signed into the `dinovlazars-projects` team (i.e. Lazar). Anonymous visitors are redirected to Vercel login. See `Decisions.md` D-1.01-6.
+  - Production alias: https://belasica.vercel.app — **public**, returns 200 and serves the same placeholder (title `Белазица — архива`, `lang="mk"`, both lines). Updates when `main` deploys on merge.
 - **CI:** none, by owner decision (D-0.00-6). Review gate = Vercel preview + completion report; Lazar merges.
 
 ## Placeholder register
