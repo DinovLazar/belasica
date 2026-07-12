@@ -14,3 +14,19 @@
 - Hosting: Vercel Pro, auto-deploy from `DinovLazar/belasica` `main`, preview per branch
 - DNS/CDN: Cloudflare — configured at 2.07
 - Rule for every future entry: exact version, date, one-line reason.
+
+## 2026-07-12 — Phase 1.01 install: exact pinned versions (as shipped)
+Scaffolded with `create-next-app@latest`, then every dependency stripped to an exact version and reinstalled so `package-lock.json` matches. No `^`/`~`/`latest` anywhere.
+- Node: `22.23.1` (from `.nvmrc`; installed via `brew install node@22` — see `Decisions.md` D-1.01-3)
+- `next@16.2.10`
+- `react@19.2.4`
+- `react-dom@19.2.4`
+- `typescript@5.9.3`
+- `tailwindcss@4.3.2`
+- `@tailwindcss/postcss@4.3.2`
+- `eslint@9.39.5`
+- `eslint-config-next@16.2.10`
+- `@types/node@20.19.43`
+- `@types/react@19.2.17`
+- `@types/react-dom@19.2.3`
+- Not installed this phase (per D-1.01-1): shadcn/ui + lucide-react → deferred to 1.04.

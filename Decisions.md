@@ -61,3 +61,42 @@
 - **Alternatives considered:** Letting either machine pick up any phase ad hoc — rejected: this exact pattern has previously cost a reconciliation phase.
 - **Consequences:** Slight coordination overhead per brief; Lazar must correct the path assumption if wrong.
 - **Links:** CLAUDE.md §Machine & shell.
+
+### D-1.01-1 · 2026-07-12 · shadcn/ui + lucide-react deferred from 1.01 to 1.04
+- **Status:** Accepted
+- **Context:** `00_stack-and-config.md` originally pinned them at 1.01, but brand tokens don't lock until 1.03.
+- **Decision:** Install them at 1.04, after `brand.md` is locked.
+- **Alternatives considered:** `shadcn init` now with a default theme, overwritten at 1.04 — rejected because it ships a throwaway theme into a reviewed preview.
+- **Consequences:** 1.04 carries the shadcn install. **Supersedes** the "pin at 1.01" line in the kickoff stack entry (`00_stack-and-config.md`, 2026-07-12).
+- **Links:** Phase 1.03, Phase 1.04, `00_stack-and-config.md`.
+
+### D-1.01-2 · 2026-07-12 · Flat repo layout — no src/ for app code
+- **Status:** Accepted
+- **Decision:** `app/`, `components/`, `lib/` at repo root; `src/` holds only `_project-state/`.
+- **Reason:** Matches the reserved-paths table in the plan and keeps the state files visually separate from application code.
+- **Consequences:** `create-next-app` was run with `--no-src-dir`; import alias `@/*` maps to repo root.
+- **Links:** Phase 1.01 brief §Tasks 3.
+
+### D-1.01-3 · 2026-07-12 · Node 22 installed via Homebrew keg (no version manager present)
+- **Status:** Accepted
+- **Context:** The brief and seed docs assume `nvm` (`nvm use`), but the executing machine has **no** version manager installed (no nvm/fnm/volta/asdf); Node default was v26 via Homebrew. Node 22 LTS is a hard requirement with a committed `.nvmrc`.
+- **Decision:** Install Node 22 with `brew install node@22` (keg-only → `22.23.1`) and use it for all scaffold/build/lint. `.nvmrc` pins `22.23.1`.
+- **Alternatives considered:** Install `nvm` and `nvm install 22` — rejected: rewrites the user's shell profile (bigger, less reversible footprint) for no benefit over a Homebrew keg. Build on the existing Node 26 — rejected: violates the Node-22 requirement and reproducibility.
+- **Consequences:** `.nvmrc` still documents the target for teammates who do use nvm; on this machine Node 22 is available via the keg path `/opt/homebrew/opt/node@22/bin`. Reversible with `brew uninstall node@22`.
+- **Links:** Phase 1.01 brief §Tasks 3, `.nvmrc`, `00_stack-and-config.md`.
+
+### D-1.01-4 · 2026-07-12 · Trimmed create-next-app demo defaults to the minimal placeholder
+- **Status:** Accepted
+- **Context:** Task 4 requires a minimal, "unstyled-beyond-defaults" placeholder with exactly two lines; the scaffold ships a demo page, Geist Google Fonts, marketing SVGs, and an `AGENTS.md`.
+- **Decision:** Removed the demo page markup (required); removed the Geist font wiring from `app/layout.tsx` and the matching `--font-*` lines in `app/globals.css`; excluded the create-next-app marketing SVGs (no `public/` dir committed); scaffolded with `--no-agents-md` (CLAUDE.md already serves the agent-instructions role and `AGENTS.md` is not a reserved path).
+- **Alternatives considered:** Keep Geist as the framework default — rejected: it loads two Google fonts unused on the placeholder, its `latin` subset does not render Macedonian Cyrillic, and choosing a font is a Phase 1.03 (`brand.md`) decision; shipping one now repeats the throwaway-theme problem from D-1.01-1.
+- **Consequences:** Placeholder renders in the system default font (Arial/Helvetica/sans-serif, already the `body` default). Real typography lands at 1.03. `globals.css` keeps the default background/foreground tokens until 1.03 replaces them.
+- **Links:** D-1.01-1, Phase 1.03, `app/layout.tsx`, `app/globals.css`.
+
+### D-1.01-5 · 2026-07-12 · Vercel project on personal scope `dinovlazars-projects`
+- **Status:** Accepted
+- **Context:** The brief says "existing Vercel Pro account/team" without naming it. Two scopes exist: `dinovlazars-projects` (Lazar's personal, the active/default scope) and `sunset-services-team` (a separate client).
+- **Decision:** Create/link the `belasica` project under `dinovlazars-projects` — belasica is Lazar's personal, non-commercial project and does not belong on a client team.
+- **Alternatives considered:** `sunset-services-team` — rejected: unrelated client team.
+- **Consequences:** GitHub repo connected under this scope; `main` → production, every branch → preview. Also added `.claude/` to `.gitignore` (public-repo hygiene: keeps local agent tooling out of the repo).
+- **Links:** Phase 1.01 brief §Tasks 7, `current-state.md`.
