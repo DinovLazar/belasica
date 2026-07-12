@@ -1,0 +1,9 @@
+# Studio dependencies & build output
+node_modules
+dist
+
+# Sanity runtime cache
+.sanity
+
+# Generated schema artifact (re-extracted by `npm run typegen`)
+schema.json
