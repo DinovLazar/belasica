@@ -48,7 +48,7 @@ The brief pre-specified D-1.01-1 and D-1.01-2. The following I had to decide mys
 - **Branch:** `phase-1.01-scaffold` (off `main`).
 - **Commits:** initial `README` on `main`; scaffold + seed files; state-sync + decisions; state-fix + completion report (this commit).
 - **New/edited files:** full Next.js scaffold (`app/`, `package.json` w/ exact pins, `package-lock.json`, `tsconfig.json`, `eslint.config.mjs`, `postcss.config.mjs`, `next.config.ts`, `.gitignore`, `.nvmrc`), rulebooks (`CLAUDE.md`, `facts.md`, `brand.md`, `Decisions.md`, `README.md`), `briefs/Part-1-Phase-01-Code.md`, `docs/design-handovers/.gitkeep`, `components/.gitkeep`, `lib/.gitkeep`, and all `src/_project-state/*` files including this report.
-- **PR:** <!-- PR_URL --> (open, unmerged — Lazar merges).
+- **PR:** https://github.com/DinovLazar/belasica/pull/1 (open, unmerged — Lazar merges).
 - **Preview URL (team-protected):** https://belasica-git-phase-101-scaffold-dinovlazars-projects.vercel.app
 - **Production URL (public):** https://belasica.vercel.app
 - **Secrets:** none committed; `.env`/`.vercel` are git-ignored. Vercel/GitHub auth lives in the local CLI keychains, not the repo.
