@@ -13,7 +13,7 @@
 | Founding year | — | UNVERIFIED — P3 |
 | Stadium name | — | UNVERIFIED — P3 |
 | Current league / status | — | UNVERIFIED — P3 |
-| Club colours | — | UNVERIFIED — P3 · **blocks Phase 1.03** |
+| Club colours | Blue `#002766` + White `#FFFFFF` | owner-selected from Stitch design (2026-07-13) — PENDING Ace's confirmation of historical club colours (P3) · **not VERIFIED** |
 
 ## People (About page)
 

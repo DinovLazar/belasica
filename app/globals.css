@@ -1,24 +1,167 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─────────────────────────────────────────────────────────────────────────
+   Design tokens — the ONLY place these live in code.
+   Source of truth: brand.md (LOCKED 2026-07-13, Stitch "Archive Editorial").
+   Nothing outside this @theme block should hardcode a colour or font.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Fonts (wired to next/font variables set in app/layout.tsx) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+
+  /* ── Archive Editorial palette (canonical names, see brand.md) ── */
+  --color-primary: #002766;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #0f3d8c;
+  --color-primary-fixed: #dae2ff;
+  --color-primary-fixed-dim: #b1c5ff;
+
+  --color-secondary: #a03f32; /* "Muted Brick" — the one accent */
+  --color-on-secondary: #ffffff;
+  --color-secondary-soft: #fd8674;
+
+  --color-surface: #f7f4ee; /* warm Paper — page background */
+  --color-surface-card: #ffffff; /* elevated white cards / tables / photo mats */
+  --color-surface-muted: #eef4ff; /* footer / muted sections */
+  --color-surface-container: #e5efff;
+  --color-surface-container-high: #dbe9fe;
+  --color-surface-container-highest: #d6e4f9;
+
+  --color-on-surface: #0f1c2c; /* ink — body text */
+  --color-on-surface-variant: #434651; /* muted ink — labels, captions */
+
+  --color-outline: #747782;
+  --color-outline-variant: #c4c6d3;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+
+  --color-inverse-surface: #243141;
+  --color-inverse-on-surface: #e9f1ff;
+
+  /* ── shadcn/ui compatibility aliases (mapped onto the palette above) ── */
+  --color-background: #f7f4ee;
+  --color-foreground: #0f1c2c;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f1c2c;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f1c2c;
+  --color-primary-foreground: #ffffff;
+  --color-secondary-foreground: #002766;
+  --color-muted: #eef4ff;
+  --color-muted-foreground: #434651;
+  --color-accent: #eef4ff; /* neutral hover surface (NOT the brick accent) */
+  --color-accent-foreground: #002766;
+  --color-destructive: #ba1a1a;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #c4c6d3;
+  --color-input: #c4c6d3;
+  --color-ring: #002766;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+/* Sharp corners everywhere — Archive Editorial is 0px radius. */
+@theme {
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ─────────────────────────────────────────────────────────────────────────
+   Reusable typography scale (brand.md → Type scale).
+   One class = family + size + line-height + weight + tracking.
+   ───────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .type-display {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 2rem; /* 32px */
+    line-height: 2.5rem; /* 40px */
+    letter-spacing: -0.02em;
+  }
+  .type-headline {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 2rem; /* 32px */
+    line-height: 2.5rem; /* 40px */
+  }
+  .type-title {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 1.5rem; /* 24px */
+    line-height: 2rem; /* 32px */
+  }
+  .type-body-lg {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.25rem; /* 20px */
+    line-height: 2rem; /* 32px */
+  }
+  .type-body {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.75rem; /* 28px */
+  }
+  .type-label {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem; /* 20px */
+    letter-spacing: 0.05em;
+  }
+  .type-table {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.5rem; /* 24px */
+  }
+  .type-caption {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.75rem; /* 12px */
+    line-height: 1rem; /* 16px */
+    letter-spacing: 0.03em;
+  }
+
+  /* Display scales up on desktop (brand.md: 32/40 → 48/56 at ≥768px) */
+  @media (min-width: 768px) {
+    .type-display {
+      font-size: 3rem; /* 48px */
+      line-height: 3.5rem; /* 56px */
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─────────────────────────────────────────────────────────────────────────
+   Base — warm paper surface, ink text, serif reading font.
+   ───────────────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Centered editorial container: mobile 16px, tablet 40px, ≥1200 fixed 1140 */
+  .editorial-container {
+    width: 100%;
+    max-width: 1140px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .editorial-container {
+      padding-inline: 40px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .editorial-container {
+      padding-inline: 0;
+    }
+  }
 }

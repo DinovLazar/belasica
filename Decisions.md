@@ -181,3 +181,43 @@
 - **Reason:** Matches the repo's exact-pinning philosophy (CLAUDE.md); a floating Studio runtime or `apiVersion` would break reproducibility.
 - **Consequences:** Studio upgrades are deliberate (bump the pin + redeploy). Studio deployed at https://belasica.sanity.studio/.
 - **Links:** Phase 1.02 brief §Tasks (deploy), `sanity/sanity.cli.ts`, `lib/sanity/client.ts`, [[D-1.01-1]].
+
+### D-1.04-1 · 2026-07-13 · Design produced in Stitch instead of the in-chat sketch + Claude Design pipeline
+- **Status:** Accepted — owner call.
+- **Context:** Lazar built the full design in Google Stitch and connected it to Claude Code as a .zip + MCP, rather than running the "sketch in chat → Claude Design handover" process in the Project Instructions.
+- **Decision:** The Stitch output is the agreed visual direction. Phase 1.03 is landed by Code transcribing that design into a locked `brand.md` + a written handover, folded into the front of the 1.04 Code brief (one branch, one PR).
+- **Alternatives considered:** Run a separate Claude Design phase — rejected: the design already exists and is owner-approved; a re-sketch would be redundant work.
+- **Consequences:** Brand tokens are extracted by Code rather than authored by Design; mitigated because the owner authored the Stitch design directly. 1.03 and 1.04 share one PR (two completion reports).
+- **Links:** Project-Instructions §How a phase runs, Phase-Plan 1.03/1.04, brand.md.
+
+### D-1.04-2 · 2026-07-13 · Club colours locked as tokens, recorded pending Ace's confirmation
+- **Status:** Accepted — owner call.
+- **Context:** brand.md/facts.md gate 1.03 on club colours being confirmed (parallel track P3). The colours are set in the Stitch design but Ace has not confirmed they match the club's historical colours.
+- **Decision:** Lock the Stitch colours as design tokens in brand.md so the build proceeds; record them in facts.md as "owner-selected (Stitch design), pending Ace" — NOT verified. Add an owed-verification item for Ace to confirm.
+- **Alternatives considered:** Block all UI work until Ace confirms — rejected by owner to keep momentum; the colours are already the owner's deliberate choice.
+- **Consequences:** Small risk of a palette change if Ace corrects the colours later; contained because tokens live only in brand.md, so a change is a single-file edit. facts.md stays honest (not falsely verified).
+- **Links:** facts.md, brand.md, parallel track P3.
+
+### D-1.04-3 · 2026-07-13 · Chose "Archive Editorial" of the two Stitch directions
+- **Status:** Accepted — owner call (Lazar chose via prompt).
+- **Context:** The Stitch `.zip` (named `…design_exploration`) actually contained **two** complete, fully-rendered directions — **Archive Editorial** (Source Serif 4, warm paper, framed B&W photos, hairline tables) and **Arena Modern** (Oswald, dark broadcast heroes, scoreboard tables) — each across home/season/legend pages. The brief assumed a single approved design; locking `brand.md` is a one-way door the whole 1.04 build reads from, so Code did not guess.
+- **Decision:** Presented both directions with a recommendation and asked. Lazar selected **Archive Editorial**, which also matches the intake direction already in `brand.md` ("historical photos given room to breathe. Readable first — a site people come to read"). Only that direction was transcribed into `brand.md`; Arena Modern was discarded.
+- **Alternatives considered:** Silently pick the intake-matching direction — rejected: a visual-direction lock is the owner's call and mis-picking means rebuilding every component.
+- **Consequences:** `brand.md`, tokens, and all components are Archive Editorial. The Stitch export is not committed (kept out of the public repo); Arena Modern is recoverable from Lazar's local export if ever needed.
+- **Links:** brand.md, docs/design-handovers/Part-1-Phase-1.03-Handover.md, [[D-1.04-1]].
+
+### D-1.04-4 · 2026-07-13 · shadcn/ui initialised manually; token vocabulary + extra pinned deps
+- **Status:** Accepted (self-made; brief said "initialise shadcn/ui … Tailwind v4" without prescribing the CLI).
+- **Context:** `npx shadcn init` is interactive and network-bound, and it rewrites `app/globals.css` to its own oklch defaults — which would clobber the Stitch tokens. Exact version pinning (CLAUDE.md) also rules out the CLI's floating installs.
+- **Decision:** Initialised shadcn/ui deterministically by hand: wrote `components.json`, `lib/utils.ts` (`cn`), and the primitives used (`components/ui/button.tsx`, `card.tsx`, `table.tsx`) adapted to sharp corners + our tokens. Kept the **Stitch/Material-style token names** (`surface`, `on-surface`, `on-surface-variant`, `primary`, `secondary`=brick accent, `outline-variant`, …) as the primary vocabulary and **added shadcn semantic aliases** (`background`, `card`, `muted`, `border`, `input`, `ring`, …) mapped onto the same hexes so a future `npx shadcn add …` works. Pinned exact: `lucide-react@1.24.0`, `class-variance-authority@0.7.1`, `clsx@2.1.1`, `tailwind-merge@3.6.0`, `@radix-ui/react-slot@1.3.0`, `tw-animate-css@1.4.0` (the last imported in `globals.css`, matching the canonical shadcn v4 setup).
+- **Alternatives considered:** Run the CLI — rejected (clobbers tokens, floating pins, interactive). Use only shadcn's semantic names — rejected: loses the finer Stitch palette (`surface-container-*`, `primary-fixed`, brick) needed for fidelity.
+- **Consequences:** Two naming schemes coexist in `globals.css` (documented in `brand.md`). shadcn primitives + future adds work; bespoke components use the richer Stitch names.
+- **Links:** app/globals.css, brand.md §Tokens, components.json, components/ui/*.
+
+### D-1.04-5 · 2026-07-13 · `/_preview` via `%5Fpreview`; single light theme
+- **Status:** Accepted (self-made).
+- **Context:** (a) In the Next.js App Router an `_`-prefixed folder is a **private folder** excluded from routing, so `app/_preview/` would not produce a `/_preview` URL. (b) The Stitch mockups carried `dark:` variants, but Archive Editorial is a warm-paper, light, print-like system.
+- **Decision:** (a) Used the documented escape — folder `app/%5Fpreview/` maps to the literal URL **`/_preview`** (the brief's requested path), `noindex` via route metadata and absent from `NAV_ITEMS`. (b) Implemented a **single light theme only**; dropped the mockups' dark-mode variants (no `prefers-color-scheme` dark block).
+- **Alternatives considered:** Name the route `/preview` (no underscore) — rejected: brief/DoD check `/_preview`. Carry dark mode — rejected: out of scope, not part of the chosen direction, and unproven for Cyrillic/contrast.
+- **Consequences:** Disk folder is literally `%5Fpreview`. If dark mode is ever wanted it's a later, deliberate phase.
+- **Links:** app/%5Fpreview/page.tsx, app/globals.css.
