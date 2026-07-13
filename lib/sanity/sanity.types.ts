@@ -15,6 +15,16 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type MatchResult = {
+  _type: "matchResult";
+  round: string;
+  date: string;
+  opponent: string;
+  venue: "\u0414\u043E\u043C\u0430" | "\u0413\u043E\u0441\u0442\u0438";
+  goalsFor: number;
+  goalsAgainst: number;
+};
+
 export type Page = {
   _id: string;
   _type: "page";
@@ -133,6 +143,7 @@ export type Season = {
   label: string;
   startYear: number;
   slug: Slug;
+  competition?: string;
   body?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -151,6 +162,11 @@ export type Season = {
     _type: "block";
     _key: string;
   }>;
+  results?: Array<
+    {
+      _key: string;
+    } & MatchResult
+  >;
   source: string;
   verified?: boolean;
 };
@@ -269,6 +285,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | MatchResult
   | Page
   | Slug
   | SeasonReference
@@ -298,12 +315,13 @@ export type ALL_SEASONS_QUERY_RESULT = Array<{
 
 // Source: ../lib/sanity/queries.ts
 // Variable: SEASON_BY_SLUG_QUERY
-// Query: *[_type == "season" && verified == true && slug.current == $slug][0]{    _id, label, startYear, "slug": slug.current, body  }
+// Query: *[_type == "season" && verified == true && slug.current == $slug][0]{    _id, label, startYear, "slug": slug.current, competition, body,    results[]{ round, date, opponent, venue, goalsFor, goalsAgainst }  }
 export type SEASON_BY_SLUG_QUERY_RESULT = {
   _id: string;
   label: string;
   startYear: number;
   slug: string;
+  competition: string | null;
   body: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -321,6 +339,14 @@ export type SEASON_BY_SLUG_QUERY_RESULT = {
     level?: number;
     _type: "block";
     _key: string;
+  }> | null;
+  results: Array<{
+    round: string;
+    date: string;
+    opponent: string;
+    venue: "\u0413\u043E\u0441\u0442\u0438" | "\u0414\u043E\u043C\u0430";
+    goalsFor: number;
+    goalsAgainst: number;
   }> | null;
 } | null;
 
@@ -394,7 +420,7 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type == "season" && verified == true] | order(startYear asc){\n    _id, label, startYear, "slug": slug.current\n  }': ALL_SEASONS_QUERY_RESULT;
-    '*[_type == "season" && verified == true && slug.current == $slug][0]{\n    _id, label, startYear, "slug": slug.current, body\n  }': SEASON_BY_SLUG_QUERY_RESULT;
+    '*[_type == "season" && verified == true && slug.current == $slug][0]{\n    _id, label, startYear, "slug": slug.current, competition, body,\n    results[]{ round, date, opponent, venue, goalsFor, goalsAgainst }\n  }': SEASON_BY_SLUG_QUERY_RESULT;
     '*[_type == "person" && verified == true] | order(fullName asc){\n    _id, fullName, "slug": slug.current, roles\n  }': ALL_PEOPLE_QUERY_RESULT;
     '*[_type == "person" && verified == true && slug.current == $slug][0]{\n    _id, fullName, "slug": slug.current, roles, bio\n  }': PERSON_BY_SLUG_QUERY_RESULT;
     '*[_type == "page" && verified == true && slug.current == $slug][0]{\n    _id, title, "slug": slug.current, body\n  }': PAGE_BY_SLUG_QUERY_RESULT;
