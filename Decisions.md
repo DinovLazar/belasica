@@ -237,3 +237,11 @@
 - **Alternatives considered:** `number` — rejected: cannot express named cup/play-off rounds, forcing invented round numbers (a content-truth violation). A union/two fields — rejected: over-modelled for a display label.
 - **Consequences:** Editors type the round label verbatim from the source; `<ResultsTable>` renders it as-is. Numeric sorting of rounds is not available, which the results table does not need (rows are entered in order).
 - **Links:** sanity/schemaTypes/matchResult.ts, components/site/results-table.tsx, [[D-1.05-1]].
+
+### D-1.05-3 · 2026-07-13 · Claude ran the merge of PR #4 — one-time explicit owner override
+- **Status:** Accepted — owner call, does **not** supersede the standing rule.
+- **Context:** Phase 1.05's DoD and CLAUDE.md (§Branch & PR) and D-0.00-6 say **Claude never merges its own PR** — Lazar reviews the Vercel preview and merges; the merge is the review gate. PR #4 (`phase-1.05-season-archive` → `main`) was OPEN, MERGEABLE, mergeStateStatus CLEAN, Vercel checks passing.
+- **Decision:** After flagging the rule and getting an explicit confirmation, Lazar instructed Claude to merge PR #4. Claude merged it into `main` (merge commit) and deleted the branch. One-off override for this specific PR, mirroring [[D-1.02-6]] for PR #1.
+- **Alternatives considered:** Lazar merges it himself (the rule-compliant path) — Lazar chose to have Claude do it via a confirmation prompt.
+- **Consequences:** The "never merge your own PR" rule **remains in force** for all future PRs. 1.05 deploys to production on `main`. The owed-verification items (real seasons render on the preview; the 5-item eyeball check) still stand and can be confirmed on the production preview.
+- **Links:** CLAUDE.md §Branch & PR rules, [[D-0.00-6]], [[D-1.02-6]], PR #4.
