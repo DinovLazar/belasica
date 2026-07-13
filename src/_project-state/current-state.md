@@ -30,7 +30,10 @@ NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
 - Current phase just closed: Part 1 · Phase 1.06 — People templates (Legends / Trainers & Presidents
   index pages + shared canonical profile + `person` schema `yearsAtClub` + role-label helpers).
   Next up: Home / About / Contact / Privacy (1.07). **Executed on Petar's MacBook, not the
-  brief-named Lazar's — owner-approved override, D-1.06-3.**
+  brief-named Lazar's — owner-approved override, D-1.06-3.** PR into `main`:
+  https://github.com/DinovLazar/belasica/pull/5 (opened from a fork — Petar lacks push access to
+  the canonical repo; Vercel won't auto-build a fork preview, so the branch must be pushed to the
+  canonical repo for the review preview — see the PR body). Awaiting Lazar's review + merge.
 
 ## Detail
 
