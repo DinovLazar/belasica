@@ -50,3 +50,23 @@ Sanity project (not a dependency, but the config authority):
 - API version pinned (client + queries + webhook GROQ): `2026-01-01` (D-1.02-10).
 - Studio deployed: https://belasica.sanity.studio/ (appId `q93d4lfwpetxz05s17ulprtb`, autoUpdates off).
 - Read token: Viewer role, in `.env.local` + Vercel only (never the repo).
+
+## 2026-07-13 — Phase 1.03/1.04 install: shadcn/ui + lucide-react (exact pinned, as shipped)
+UI libraries deferred from 1.01 (D-1.01-1), added now for the design foundation. All exact-pinned
+(no `^`/`~`/`latest`), installed with `npm install -E` under Node `22.23.1` (`.nvmrc`). shadcn/ui was
+initialised **manually** (no CLI) so it reads the Stitch tokens and doesn't clobber `app/globals.css`
+(D-1.04-4). Added to the app (root `package.json`) dependencies:
+- `lucide-react@1.24.0` — icon set (replaces the Stitch mockups' Material Symbols).
+- `class-variance-authority@0.7.1` — variant API for the shadcn `Button`.
+- `clsx@2.1.1` + `tailwind-merge@3.6.0` — the `cn()` class combiner (`lib/utils.ts`).
+- `@radix-ui/react-slot@1.3.0` — `asChild` support in the shadcn `Button`.
+- `tw-animate-css@1.4.0` — Tailwind v4 animation utilities; imported in `app/globals.css` (canonical shadcn v4 setup), for future shadcn primitives.
+- All verified React 19-compatible. `next build` + `eslint` pass on Node 22.23.1.
+
+Fonts (no dependency added — `next/font/google`, self-hosted at build): **Source Serif 4** (weights
+400/600/700) and **Inter** (400/500/600/700), both with the `cyrillic` subset. Macedonian glyph gate
+passed at all weights (see `brand.md` §Cyrillic gate).
+
+Config authority: `components.json` (shadcn: new-york, Tailwind v4, cssVariables, aliases
+`@/components`, `@/lib/utils`, `@/components/ui`). Design tokens live only in `brand.md` →
+`app/globals.css` `@theme`.
