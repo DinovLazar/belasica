@@ -33,7 +33,8 @@ The design foundation is now real, reusable code. There’s a header with the cl
 - **New — UI:** `components.json`, `lib/utils.ts`, `components/ui/{button,card,table}.tsx`, `components/site/{nav-items.ts,site-header.tsx,site-footer.tsx,results-table.tsx,photo-frame.tsx}`, `app/%5Fpreview/page.tsx`.
 - **Edited:** `app/globals.css` (token `@theme` + `.type-*` + `.editorial-container`), `app/layout.tsx` (fonts), `package.json` / `package-lock.json`.
 - **Branch:** `phase-1.03-1.04-design-foundation`.
-- **PR:** _added after push_ · **Preview (build gate):** `https://<vercel-branch-preview>/_preview` — the exact URL is on the PR’s Vercel deployment (added below after push).
+- **PR:** https://github.com/DinovLazar/belasica/pull/3
+- **Preview (build gate — the review page):** https://belasica-git-phase-103-104-design-f-3a7551-dinovlazars-projects.vercel.app/_preview _(Vercel branch alias; deployment protection means it opens for the team — Lazar. Immutable deploy: `https://belasica-eywsuay6r-dinovlazars-projects.vercel.app/_preview`.)_
 
 ## 6. State updates done
 
