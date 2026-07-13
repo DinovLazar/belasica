@@ -38,8 +38,8 @@ There is now a public **archive index** that lists the club's seasons grouped by
 - **New:** `app/arhiva/page.tsx` (decade index), `app/arhiva/[slug]/page.tsx` (season page), `components/site/portable-text.tsx` (`PortableTextBody`), `sanity/schemaTypes/matchResult.ts` (`matchResult` object).
 - **Edited:** `sanity/schemaTypes/season.ts` (+`competition`, +`results`), `sanity/schemaTypes/index.ts` (register `matchResult`), `lib/sanity/queries.ts` (`SEASON_BY_SLUG_QUERY` projection), `lib/sanity/sanity.types.ts` (regenerated), `package.json` / `package-lock.json` (`@portabletext/react@6.2.0`), and the state files (`current-state.md`, `file-map.md`, `00_stack-and-config.md`, `Decisions.md`).
 - **Branch:** `phase-1.05-season-archive`.
-- **PR:** _(added after the PR is opened)_
-- **Preview (build gate — the review page):** _(added after the PR is opened — Vercel branch preview; team-protected, opens for Lazar)_
+- **PR:** https://github.com/DinovLazar/belasica/pull/4
+- **Preview (build gate — the review page):** https://belasica-git-phase-105-season-archive-dinovlazars-projects.vercel.app/arhiva _(Vercel branch alias; deployment protection means it opens for the team — Lazar — via SSO, D-1.01-6. Branch deploy reported `success`; anonymous `GET /arhiva` returns the expected 302 SSO redirect.)_
 
 ## 6. State updates done
 
