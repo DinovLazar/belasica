@@ -1,4 +1,4 @@
-NEXT: Part 1 · Phase 1.06 — People / Legends (legends, trainers & presidents) (Code)
+NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
 
 # current-state.md — Belasica
 
@@ -12,18 +12,25 @@ NEXT: Part 1 · Phase 1.06 — People / Legends (legends, trainers & presidents)
   in a locked `brand.md` wired into Tailwind v4. On top of it, the **season archive templates are
   built**: a public **decade index at `/arhiva`** (verified seasons grouped by decade, with an honest
   Macedonian empty state) and a **season page at `/arhiva/[slug]`** (hero, a Portable Text write-up,
-  and the outcome-coloured results table, in the 12-column editorial layout). These are the first
-  **real public pages** to use the shared header/nav/footer. The `season` model now carries a
-  structured **`results`** list and an optional **`competition`** label; the data layer still returns
-  **only `verified == true`** documents, so unverified research renders nowhere.
-- Stubbed / not wired yet: People/Legends (`/legendi`, `/treneri-i-pretsedateli`) arrive at 1.06;
-  Home/About/Contact/Privacy at 1.07. The public homepage `/` is still the 1.01 placeholder. No real
-  club content is entered yet — `production` holds **zero** content documents by design, so `/arhiva`
-  currently renders its empty state and the season page is a proven template awaiting verified seasons
-  (entered by a human via the Studio, flipped `verified` by Lazar/Ace). Club **name** is still an
-  unverified placeholder (P3); club **colours** are set from the design but **pending Ace** (not VERIFIED).
-- Current phase just closed: Part 1 · Phase 1.05 — Season archive templates (decade index + season
-  page + Portable Text renderer + `season` schema `results`/`competition`). Next up: People / Legends (1.06).
+  and the outcome-coloured results table, in the 12-column editorial layout). On the same template
+  family, the **people templates are now built** (1.06): index pages at **`/legendi`** (verified
+  people whose roles include *player*) and **`/treneri-i-pretsedateli`** (roles include *trainer* or
+  *president*), plus a single **canonical profile at `/licnost/[slug]`** shared by both sections
+  (hero name + role labels, Portable Text bio, a details aside with Улога(и) + Години во клубот). The
+  `season` model carries a structured **`results`** list + optional **`competition`**; the `person`
+  model gains an optional **`yearsAtClub`** label. The data layer still returns **only
+  `verified == true`** documents, so unverified research renders nowhere.
+- Stubbed / not wired yet: Home/About/Contact/Privacy pages arrive at 1.07. The public homepage `/`
+  is still the 1.01 placeholder. No real club content is entered yet — `production` holds **zero**
+  content documents by design, so `/arhiva`, `/legendi` and `/treneri-i-pretsedateli` currently render
+  their empty states, and the season and profile pages are proven templates awaiting verified
+  documents (entered by a human via the Studio, flipped `verified` by Lazar/Ace). Club **name** is
+  still an unverified placeholder (P3); club **colours** are set from the design but **pending Ace**
+  (not VERIFIED).
+- Current phase just closed: Part 1 · Phase 1.06 — People templates (Legends / Trainers & Presidents
+  index pages + shared canonical profile + `person` schema `yearsAtClub` + role-label helpers).
+  Next up: Home / About / Contact / Privacy (1.07). **Executed on Petar's MacBook, not the
+  brief-named Lazar's — owner-approved override, D-1.06-3.**
 
 ## Detail
 
@@ -46,8 +53,11 @@ NEXT: Part 1 · Phase 1.06 — People / Legends (legends, trainers & presidents)
   `components/ui/`: `button.tsx`, `card.tsx`, `table.tsx` — adapted to the Stitch tokens. Site components
   in `components/site/`: `site-header.tsx` (masthead + 7-label nav / mobile drawer, `activeHref`),
   `site-footer.tsx`, `results-table.tsx` (`ResultsTable`, typed `MatchResult[]`, outcome-coloured score),
-  `photo-frame.tsx` (`PhotoFrame`, placeholder when no `src`), `nav-items.ts`, and **`portable-text.tsx`
-  (`PortableTextBody`, new 1.05 — maps Portable Text blocks/marks/links/lists to the `.type-*` scale)**.
+  `photo-frame.tsx` (`PhotoFrame`, placeholder when no `src`), `nav-items.ts`, **`portable-text.tsx`
+  (`PortableTextBody`, 1.05 — maps Portable Text blocks/marks/links/lists to the `.type-*` scale)**,
+  and **new 1.06: `person-roles.ts`** (role vocabulary + `roleLabels()` — player/trainer/president →
+  Играч/Тренер/Претседател, single source) and **`people-list.tsx`** (`PeopleList` — alphabetical
+  hairline grid of person links to `/licnost/[slug]`; renders only the verified list it is given).
   Icons: `lucide-react`.
 - **Routes:** `/` (static, unchanged 1.01 placeholder), `/_not-found` (static), `/_preview` (static,
   `noindex`, internal — folder `app/%5Fpreview/`, D-1.04-5), `/api/revalidate` (dynamic webhook target),
@@ -55,15 +65,25 @@ NEXT: Part 1 · Phase 1.06 — People / Legends (legends, trainers & presidents)
   (SSG via `generateStaticParams()` from `getAllSeasons()`; `notFound()` on unknown/unverified slug;
   refreshes through the existing `season` / `season:<slug>` cache tags on the revalidate webhook). With
   zero verified seasons, `generateStaticParams` yields none and `/arhiva` prerenders the empty state.
-- **Sanity (schema extended in 1.05):** Project `belasica` = **`f8rmnfry`**, org **“Belasica”**
-  (`obJ2FYA4n`), free tier. Datasets `production` + `test` (both private). Studio deployed at
-  **https://belasica.sanity.studio/**. Four document types (`season`, `person`, `story`, `page`) + a
+  **New in 1.06:** `/legendi` and `/treneri-i-pretsedateli` (static index pages — both fetch
+  `getAllPeople()` and role-filter in the page; honest Macedonian empty state at zero people) and
+  `/licnost/[slug]` (SSG via `generateStaticParams()` from `getAllPeople()`; `notFound()` on
+  unknown/unverified slug; `person` / `person:<slug>` cache tags). With zero verified people, the two
+  indexes prerender their empty states and `/licnost/[slug]` yields no params; an unknown profile slug
+  returns 404 (verified via `next start`).
+- **Sanity (schema extended in 1.05–1.06):** Project `belasica` = **`f8rmnfry`**, org **“Belasica”**
+  (`obJ2FYA4n`), free tier. Datasets `production` + `test` (recorded private, D-1.02-2 — but see the
+  owed-verification register: `production` currently serves anonymous published reads). Studio deployed
+  at **https://belasica.sanity.studio/**. Four document types (`season`, `person`, `story`, `page`) + a
   reusable **`matchResult`** object (1.05), each document with a required `source` and a `verified`
-  boolean defaulting to **false**. `season` now has: `label`, `startYear`, `slug`, **`competition`**
+  boolean defaulting to **false**. `season` has: `label`, `startYear`, `slug`, **`competition`**
   (optional string), `body` (Portable Text), **`results`** (array of `matchResult`: round/date/opponent/
-  venue Дома-Гости/goalsFor/goalsAgainst), + provenance (D-1.05-1). Data layer in `lib/sanity/`
-  (`client.ts`, `queries.ts` composing `VERIFIED_FILTER`, generated `sanity.types.ts` — regenerated,
-  17 schema types). `SEASON_BY_SLUG_QUERY` projects `competition` + `results`. Webhook `revalidate-nextjs`
+  venue Дома-Гости/goalsFor/goalsAgainst), + provenance (D-1.05-1). `person` has: `fullName`, `slug`,
+  `roles` (player/trainer/president), `bio` (Portable Text), **`yearsAtClub`** (optional string, new
+  1.06, D-1.06-1), + provenance. Data layer in `lib/sanity/` (`client.ts`, `queries.ts` composing
+  `VERIFIED_FILTER`, generated `sanity.types.ts` — regenerated, 17 schema types). `SEASON_BY_SLUG_QUERY`
+  projects `competition` + `results`; `PERSON_BY_SLUG_QUERY` projects `yearsAtClub`
+  (`PERSON_BY_SLUG_QUERY_RESULT.yearsAtClub: string | null`). Webhook `revalidate-nextjs`
   → `/api/revalidate`. `npm run check:gate` passes (only verified docs return).
 - **Secrets:** `SANITY_API_READ_TOKEN` (Viewer) + `SANITY_REVALIDATE_SECRET` in `.env.local`
   (git-ignored) and Vercel. `.env.example` lists variable names only. No secrets in the repo.
@@ -73,8 +93,12 @@ NEXT: Part 1 · Phase 1.06 — People / Legends (legends, trainers & presidents)
 - **Vercel:** project `belasica` on `dinovlazars-projects`; `main` → production, every branch → preview
   (previews team-protected, D-1.01-6).
 - **CI:** none (D-0.00-6). Review gate = Vercel preview + completion report; Lazar merges.
-- **Build/lint:** `npm run build` and `npm run lint` both pass on Node 22.23.1 (Turbopack). Runtime of
-  `/arhiva` (empty state, 200) and an unknown season slug (404) verified locally via `next start`.
+- **Build/lint:** `npm run build` and `npm run lint` both pass on Node 22.23.1 (Turbopack). On Petar's
+  machine Node 22.23.1 is provided via `fnm` (`fnm exec --using=22.23.1`, D-1.06-4). Runtime verified
+  locally via `next start`: `/arhiva`, `/legendi`, `/treneri-i-pretsedateli` empty states (200, zero
+  invented `/licnost/…` links); unknown season slug and unknown profile slug (`/licnost/…`) both 404.
+  The local build used the non-secret public `NEXT_PUBLIC_SANITY_PROJECT_ID`/`_DATASET` inline (no
+  `.env.local`, no token) — see D-1.06-5.
 
 ## Placeholder register
 
@@ -96,13 +120,17 @@ placeholder tokens — missing content is handled by honest empty states, not `[
 
 | Item | Owed by | Since phase |
 |---|---|---|
-| Open the deployed Studio (https://belasica.sanity.studio/), sign in, confirm the document types show Macedonian labels, a new Season has `verified` **off** by default, and the new `competition` + `results` (match) fields render with Macedonian labels | Lazar | 1.02 / 1.05 |
+| Open the deployed Studio (https://belasica.sanity.studio/), sign in, confirm the document types show Macedonian labels, a new Season/Person has `verified` **off** by default, and the new fields render with Macedonian labels — `season` `competition` + `results` (match), and `person` **`yearsAtClub`** ("Години во клубот") | Lazar | 1.02 / 1.05 / 1.06 |
 | Ace confirms the club colours are historically correct → flip `facts.md` colours to VERIFIED | Ace (via Lazar) | 1.04 |
-| On the 1.05 PR preview: the 2–3 real seasons (entered from the Drive and flipped `verified: true`) render correctly, and the 5-item eyeball checklist passes; then merge the PR | Lazar | 1.05 |
+| Templated pages (season, **profile**, and later home) prove their with-verified-content render once ≥1 verified document of each type exists — confirmed by Lazar on the PR preview at/after the 2.01 ingestion pilot, including the 5-item eyeball checklist per page | Lazar | 1.05 / 1.06 |
 
-*(The last item is this PR's normal review gate plus the phase's real-season proof — a season page with
-real, verified data can only be confirmed once content exists. The substantive standing items are the
-Studio check and Ace's colours. No font-replacement approval is owed — the Cyrillic gate passed.)*
+*(The last item is the standing real-content proof for every templated page — a season or profile page
+with real, verified data can only be confirmed once content exists (`production` holds zero content
+documents today). It folds in 1.06's profile render (brief §Owed) rather than adding a per-phase line.
+The substantive standing items are the Studio check and Ace's colours. No font-replacement approval is
+owed — the Cyrillic gate passed. Each phase PR still carries its own normal review-gate merge by Lazar,
+per CLAUDE.md. **See Known issues for the `production` anonymous-read finding (D-1.06-5) — a security
+decision Lazar owes.**)*
 
 ## Known issues
 
@@ -116,3 +144,11 @@ Studio check and Ace's colours. No font-replacement approval is owed — the Cyr
   advisories. `npm audit fix --force` deliberately not run (it would break exact pins).
 - The `/_preview` route folder is literally `app/%5Fpreview/` (URL-escaped underscore) — intentional
   (App Router private-folder escape, D-1.04-5), not a typo.
+- **`production` serves anonymous published reads (security follow-up, D-1.06-5).** An unauthenticated
+  CDN query of `production` returns HTTP 200 with results — i.e. published docs are readable without a
+  token, contrary to D-1.02-2's "both datasets private". No exposure today (`production` holds zero
+  content documents), but once published-but-`verified:false` research exists it could be read via raw
+  GROQ by anyone with the public project id, bypassing the intended **dataset-level** gate. The site's
+  `verified == true` **query** gate is unaffected. Fixing this is a Sanity dataset-visibility change —
+  Lazar's call — and was **not** made here (a security-setting change out of 1.06 scope). Surfaced by
+  the 1.06 local build, which relied on this anonymous read (no `.env.local` on Petar's machine).

@@ -3,8 +3,9 @@ import { provenanceFields, verifiedSubtitle } from './provenance'
 
 /**
  * Person — a player, trainer or president connected to the club.
- * Identity + provenance only for now; richer fields come at 1.05–1.06 against
- * real Drive material (D-1.02-4).
+ * Identity + provenance + a single optional `yearsAtClub` label (1.06, D-1.06-1).
+ * Positions, spells, stats and photos stay deferred to 2.05/2.06 — modelled
+ * against real Drive material, not blind (D-1.02-4).
  */
 export const person = defineType({
   name: 'person',
@@ -45,6 +46,13 @@ export const person = defineType({
       title: 'Биографија',
       type: 'array',
       of: [defineArrayMember({ type: 'block' })],
+    }),
+    defineField({
+      name: 'yearsAtClub',
+      title: 'Години во клубот',
+      type: 'string',
+      description:
+        'Периодот во клубот како текст — на пример опсег „1975–1982“ (незадолжително).',
     }),
     ...provenanceFields,
   ],

@@ -245,3 +245,43 @@
 - **Alternatives considered:** Lazar merges it himself (the rule-compliant path) — Lazar chose to have Claude do it via a confirmation prompt.
 - **Consequences:** The "never merge your own PR" rule **remains in force** for all future PRs. 1.05 deploys to production on `main`. The owed-verification items (real seasons render on the preview; the 5-item eyeball check) still stand and can be confirmed on the production preview.
 - **Links:** CLAUDE.md §Branch & PR rules, [[D-0.00-6]], [[D-1.02-6]], PR #4.
+
+### D-1.06-1 · 2026-07-13 · Person schema extended with only `yearsAtClub`; positions/spells/stats/photos stay deferred
+- **Status:** Accepted (brief-specified scope call).
+- **Context:** `person` shipped as identity + provenance only (D-1.02-4). Phase 1.06 builds the profile page, which needs a small, safe biographical field; the richer person shape is still unknown until the archive is surveyed.
+- **Decision:** Added exactly one optional field — `yearsAtClub` (`string`, title "Години во клубот"), placed after `bio`, before the provenance spread. Positions, multiple spells, transfer history, statistics (appearances/goals/records) and photos are **not** modelled — they belong to 2.05 (photos) / 2.06 (statistics), against the full archive.
+- **Alternatives considered:** Model positions/spells/stats now — rejected: repeats the blind-modelling rewrite risk of D-1.02-4 / D-1.05-1.
+- **Consequences:** `PERSON_BY_SLUG_QUERY` projects `yearsAtClub`; `sanity.types.ts` regenerated (`PERSON_BY_SLUG_QUERY_RESULT.yearsAtClub: string | null`; `Person.yearsAtClub?: string`). `verified` still defaults to false.
+- **Links:** [[D-1.02-4]], [[D-1.05-1]], sanity/schemaTypes/person.ts, lib/sanity/queries.ts.
+
+### D-1.06-2 · 2026-07-13 · Canonical profile URL `/licnost/[slug]`, shared by both people sections
+- **Status:** Accepted — set by the orchestrator; logged so the reason is on record.
+- **Context:** A person can hold several roles (e.g. player **and** president) and legitimately appears in both the Легенди and Тренери и претседатели indexes. Section-scoped profile URLs would give one person duplicate pages, split content, and create an ambiguous canonical.
+- **Decision:** One profile page per person at `/licnost/[slug]`, shared by both index sections. Both indexes link to the same canonical URL. The back-link and header active state resolve to the person's "home" section — Легенди if `roles` includes `player`, otherwise Тренери и претседатели.
+- **Alternatives considered:** `/legendi/[slug]` + `/treneri-i-pretsedateli/[slug]` — rejected: duplicate pages for multi-role people, duplicate content, ambiguous canonical URL.
+- **Consequences:** `generateStaticParams` over all verified people yields exactly one page each; a multi-role person appears in both lists but resolves to a single page.
+- **Links:** app/licnost/[slug]/page.tsx, app/legendi/page.tsx, app/treneri-i-pretsedateli/page.tsx.
+
+### D-1.06-3 · 2026-07-13 · Phase 1.06 executed on Petar's MacBook, not Lazar's (owner override)
+- **Status:** Accepted — owner call (answered via in-session prompt). Does **not** supersede the standing machine rule.
+- **Context:** The 1.06 brief names "**Execute on: Lazar's MacBook**"; CLAUDE.md §Machine & shell and D-0.00-7 say execute only on the named machine. The executing machine is Petar's (`Petars-MacBook-Neo.local`, git user Petar Jakimov, no prior deps installed).
+- **Decision:** After flagging the mismatch, the owner chose "Proceed here anyway". Phase 1.06 was built, verified and PR-opened from Petar's machine under Petar's git identity.
+- **Alternatives considered:** Stop and re-run on Lazar's MacBook (the rule-compliant path) — owner declined, to keep momentum.
+- **Consequences:** The named-machine rule remains in force for future phases. This PR is authored by Petar Jakimov, not DinovLazar. One-phase-branch-at-a-time (D-0.00-7) still holds: `phase-1.06-people` is the only open phase branch, so no collision.
+- **Links:** [[D-0.00-7]], CLAUDE.md §Machine & shell.
+
+### D-1.06-4 · 2026-07-13 · Node 22.23.1 installed via fnm on Petar's machine
+- **Status:** Accepted (self-made; forced by the machine's toolchain).
+- **Context:** `.nvmrc` pins `22.23.1`; Petar's machine defaulted to Node 24 (managed by `fnm`) with no Node 22 present and no nvm/Homebrew keg. D-1.01-3 solved the identical problem on the other machine with a Homebrew keg.
+- **Decision:** Installed Node 22.23.1 via the machine's existing `fnm` (`fnm install 22.23.1`) and ran every build/lint/typegen command through `fnm exec --using=22.23.1`. No shell-profile rewrite; reversible with `fnm uninstall 22.23.1`.
+- **Alternatives considered:** Build on Node 24 — rejected: violates the pinned-Node requirement and reproducibility. Install nvm — rejected: `fnm` is already present; a second version manager is needless.
+- **Consequences:** The pinned version is now available on both machines, each via its own manager (Homebrew keg on Lazar's, fnm on Petar's). `.nvmrc` still documents the target for either.
+- **Links:** [[D-1.01-3]], .nvmrc.
+
+### D-1.06-5 · 2026-07-13 · Local build verified with the public project id + dataset (no token); `production` observed to serve anonymous reads
+- **Status:** Accepted (self-made verification approach) — with a **flagged follow-up for Lazar**.
+- **Context:** Petar's machine has no `.env.local`, and the secret `SANITY_API_READ_TOKEN` must not be fabricated or typed into a file. `next build` fetches at build time. `NEXT_PUBLIC_SANITY_PROJECT_ID` (`f8rmnfry`) and `NEXT_PUBLIC_SANITY_DATASET` (`production`) are **non-secret** (committed in state docs, and shipped to the browser as `NEXT_PUBLIC_` vars).
+- **Decision:** Ran `next build` / `next start` with those two public values passed inline (no `.env.local` written, no token used). Build and runtime succeeded because an anonymous published read of `production` returns the true empty state (0 content documents), which is all the pages need to prerender.
+- **Finding (out of 1.06 scope — flagged to Lazar):** an anonymous CDN read of `production` returns **HTTP 200 with results** — published docs are readable without a token. D-1.02-2 records both datasets as *private* precisely so "anyone with the project ID" cannot read unverified research. With zero content today there is **no** exposure; but once published-but-`verified:false` docs exist they could be anonymously readable via raw GROQ, bypassing the intended **dataset-level** protection. (The site's `verified == true` query gate still holds — the gap is the dataset ACL, not the site.) Changing dataset visibility is a security-setting change and Lazar's call — **not** touched here.
+- **Alternatives considered:** Ask the owner to paste the read token / write `.env.local` — declined (secret handling; unnecessary once the anonymous read sufficed). `vercel env pull` — no `.vercel` link on this machine.
+- **Links:** [[D-1.02-2]], [[D-1.02-3]], lib/sanity/client.ts, lib/sanity/queries.ts.

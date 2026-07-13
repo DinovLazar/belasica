@@ -8,7 +8,7 @@
 - `CLAUDE.md` — Claude Code's standing rules (behavioral contract, <150 lines)
 - `facts.md` — verified club-level facts; the only legal source for factual claims
 - `brand.md` — design tokens + brand rules; the only token source (**LOCKED 2026-07-13** — Stitch "Archive Editorial")
-- `Decisions.md` — append-only decision log (through D-1.05-2)
+- `Decisions.md` — append-only decision log (through D-1.06-5)
 - `components.json` — shadcn/ui config (new-york, Tailwind v4, css `app/globals.css`, aliases)
 - `.nvmrc` — pinned Node version (22.23.1)
 - `.gitignore` — ignores node_modules, .next, .vercel, .env*, .DS_Store, .claude, etc.
@@ -30,6 +30,9 @@
 - `app/%5Fpreview/page.tsx` — internal component preview at URL `/_preview` (`noindex`, not in nav); shows type scale, colours, Cyrillic gate, buttons, results table, cards, photo frames (`%5F` = escaped underscore, D-1.04-5)
 - `app/arhiva/page.tsx` — decade index at `/arhiva`: verified seasons grouped by decade (hairline grid), honest Macedonian empty state; header active on `/arhiva` (1.05)
 - `app/arhiva/[slug]/page.tsx` — season page at `/arhiva/[slug]`: `generateStaticParams` + `notFound()`; hero (label + competition), Portable Text write-up, `<ResultsTable>`, 12-col layout with details aside (1.05)
+- `app/legendi/page.tsx` — Legends index at `/legendi`: verified people whose `roles` include `player`, alphabetical grid (`<PeopleList>`), honest Macedonian empty state; header active on `/legendi` (1.06)
+- `app/treneri-i-pretsedateli/page.tsx` — Trainers & Presidents index at `/treneri-i-pretsedateli`: verified people whose `roles` include `trainer` **or** `president`; same grid + empty-state pattern; header active on `/treneri-i-pretsedateli` (1.06)
+- `app/licnost/[slug]/page.tsx` — canonical profile page at `/licnost/[slug]` (shared by both people sections, D-1.06-2): `generateStaticParams` + `notFound()`; hero (name + role labels), Portable Text bio, 12-col layout with details aside (Улога(и) + Години во клубот); back-link/active state resolve to the person's home section; no photo/stats yet (1.06)
 - `app/favicon.ico` — default favicon
 - `app/api/revalidate/route.ts` — POST webhook target; verifies the Sanity signature (401 if bad) and `revalidateTag(tag, {expire:0})`
 
@@ -44,10 +47,12 @@
 - `components/site/results-table.tsx` — `ResultsTable` (typed `MatchResult[]`; outcome-coloured score cell); never invents data
 - `components/site/photo-frame.tsx` — `PhotoFrame` matted historical-photo treatment (grayscale→colour, caption; placeholder panel when no `src`)
 - `components/site/portable-text.tsx` — `PortableTextBody`: renders a Portable Text `body` array to the `.type-*` scale + tokens (blocks, marks, links, lists); server component, `@portabletext/react` (1.05)
+- `components/site/person-roles.ts` — role vocabulary + helpers (`ROLE_LABELS`, `roleLabel`, `roleLabels`): maps `player/trainer/president` → Играч/Тренер/Претседател, joins multi-role labels in canonical order; single source shared by both people indexes + the profile (1.06)
+- `components/site/people-list.tsx` — `PeopleList`: alphabetical hairline grid of person links to `/licnost/[slug]` (name + role label(s)); renders only the verified, role-filtered list the page supplies — never invents/sorts/filters (1.06)
 
 ## Sanity data layer (Next.js side — `lib/sanity/`)
 - `lib/sanity/client.ts` — configured Sanity read client (env-driven, pinned apiVersion, server-only token) + `sanityFetch` helper
-- `lib/sanity/queries.ts` — the 5 GROQ queries via `defineQuery`, all composing the exported `VERIFIED_FILTER`; tagged fetchers matching the webhook (`SEASON_BY_SLUG_QUERY` projects `competition` + `results` as of 1.05)
+- `lib/sanity/queries.ts` — the 5 GROQ queries via `defineQuery`, all composing the exported `VERIFIED_FILTER`; tagged fetchers matching the webhook (`SEASON_BY_SLUG_QUERY` projects `competition` + `results` as of 1.05; `PERSON_BY_SLUG_QUERY` projects `yearsAtClub` as of 1.06)
 - `lib/sanity/sanity.types.ts` — **generated** by Sanity TypeGen (`npm run typegen`); committed; imported by `queries.ts`
 
 ## Scripts
@@ -64,7 +69,7 @@
 - `sanity/schemaTypes/provenance.ts` — shared `source` + `verified` fields (the truth rules), reused by all four
 - `sanity/schemaTypes/season.ts` — Season schema (label, startYear, slug, competition, body, results + provenance)
 - `sanity/schemaTypes/matchResult.ts` — reusable `matchResult` object (round, date, opponent, venue, goalsFor, goalsAgainst) embedded in `season.results`; mirrors `<ResultsTable>` `MatchResult` (1.05, D-1.05-1)
-- `sanity/schemaTypes/person.ts` — Person schema (fullName, slug, roles, bio + provenance)
+- `sanity/schemaTypes/person.ts` — Person schema (fullName, slug, roles, bio, `yearsAtClub` + provenance; `yearsAtClub` added 1.06, D-1.06-1)
 - `sanity/schemaTypes/story.ts` — Story schema (title, slug, body, season references + provenance)
 - `sanity/schemaTypes/page.ts` — Page schema (title, slug, body + provenance)
 
@@ -84,3 +89,4 @@
 - `src/_project-state/completions/Part-1-Phase-1.03-Completion.md` — Phase 1.03 completion report (design → brand.md + handover)
 - `src/_project-state/completions/Part-1-Phase-1.04-Completion.md` — Phase 1.04 completion report (layout + shared components)
 - `src/_project-state/completions/Part-1-Phase-1.05-Completion.md` — Phase 1.05 completion report (season archive templates)
+- `src/_project-state/completions/Part-1-Phase-1.06-Completion.md` — Phase 1.06 completion report (people templates: legends, trainers & presidents)
