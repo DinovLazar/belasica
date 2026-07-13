@@ -36,7 +36,8 @@ export const ALL_SEASONS_QUERY = defineQuery(
 
 export const SEASON_BY_SLUG_QUERY = defineQuery(
   `*[_type == "season" && ${VERIFIED_FILTER} && slug.current == $slug][0]{
-    _id, label, startYear, "slug": slug.current, body
+    _id, label, startYear, "slug": slug.current, competition, body,
+    results[]{ round, date, opponent, venue, goalsFor, goalsAgainst }
   }`,
 )
 

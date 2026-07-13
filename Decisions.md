@@ -221,3 +221,27 @@
 - **Alternatives considered:** Name the route `/preview` (no underscore) — rejected: brief/DoD check `/_preview`. Carry dark mode — rejected: out of scope, not part of the chosen direction, and unproven for Cyrillic/contrast.
 - **Consequences:** Disk folder is literally `%5Fpreview`. If dark mode is ever wanted it's a later, deliberate phase.
 - **Links:** app/%5Fpreview/page.tsx, app/globals.css.
+
+### D-1.05-1 · 2026-07-13 · Season schema extended with `results` + `competition` now; squad, scorers, league table, photos stay deferred
+- **Status:** Accepted (brief-specified scope call).
+- **Context:** 1.02 shipped `season` as identity + provenance only (D-1.02-4), deferring the archive's real shape until Ace's Drive was surveyed. Phase 1.05 builds the season page, which needs structured match results, and the parallel content track has real seasons ready to enter.
+- **Decision:** Added exactly two content fields to `season`: an optional `competition` string and a `results` array of a new reusable `matchResult` object (round, date, opponent, venue Дома/Гости, goalsFor, goalsAgainst) whose shape mirrors the site's `<ResultsTable>` `MatchResult` type. `matchResult` is registered in `sanity/schemaTypes/index.ts`. The existing `body` (Portable Text) write-up is kept. **League final table, squad lists and scorers remain unmodelled** — they feed Statistics (2.06) and are modelled there against the full archive; **photos/galleries** stay for 2.05. Nothing else added.
+- **Alternatives considered:** Model squad/scorers/table now too — rejected: they belong to their named phases (2.05/2.06) and modelling them blind here repeats the D-1.02-4 rewrite risk. Inline the match object anonymously in the array — rejected: a named `matchResult` type is reusable and gives clean TypeGen types.
+- **Consequences:** `SEASON_BY_SLUG_QUERY` projects `competition` + `results`; `sanity.types.ts` regenerated. `verified` still defaults to false, so unverified seasons render nowhere. Statistics (2.06) will read `results` across seasons.
+- **Links:** [[D-1.02-4]], sanity/schemaTypes/season.ts, sanity/schemaTypes/matchResult.ts, lib/sanity/queries.ts, components/site/results-table.tsx.
+
+### D-1.05-2 · 2026-07-13 · `matchResult.round` modelled as a required string, not a number
+- **Status:** Accepted (self-made; the brief said "number or string").
+- **Context:** The brief specified `round` as "(number or string)". A Sanity field is single-typed, so one representation had to be chosen. The archive includes cup ties and play-offs whose "round" is a name ("Финале", "1/8-финале"), not an integer.
+- **Decision:** Modelled `round` as a required `string`. A string holds both a numeric label ("5") and a named phase ("Финале"), and satisfies the site's `MatchResult.round: number | string` type. All six `matchResult` fields are `Rule.required()` so the extracted schema (extracted with `--enforce-required-fields`) yields non-optional TypeGen types that map straight into `<ResultsTable>` with no reshaping.
+- **Alternatives considered:** `number` — rejected: cannot express named cup/play-off rounds, forcing invented round numbers (a content-truth violation). A union/two fields — rejected: over-modelled for a display label.
+- **Consequences:** Editors type the round label verbatim from the source; `<ResultsTable>` renders it as-is. Numeric sorting of rounds is not available, which the results table does not need (rows are entered in order).
+- **Links:** sanity/schemaTypes/matchResult.ts, components/site/results-table.tsx, [[D-1.05-1]].
+
+### D-1.05-3 · 2026-07-13 · Claude ran the merge of PR #4 — one-time explicit owner override
+- **Status:** Accepted — owner call, does **not** supersede the standing rule.
+- **Context:** Phase 1.05's DoD and CLAUDE.md (§Branch & PR) and D-0.00-6 say **Claude never merges its own PR** — Lazar reviews the Vercel preview and merges; the merge is the review gate. PR #4 (`phase-1.05-season-archive` → `main`) was OPEN, MERGEABLE, mergeStateStatus CLEAN, Vercel checks passing.
+- **Decision:** After flagging the rule and getting an explicit confirmation, Lazar instructed Claude to merge PR #4. Claude merged it into `main` (merge commit) and deleted the branch. One-off override for this specific PR, mirroring [[D-1.02-6]] for PR #1.
+- **Alternatives considered:** Lazar merges it himself (the rule-compliant path) — Lazar chose to have Claude do it via a confirmation prompt.
+- **Consequences:** The "never merge your own PR" rule **remains in force** for all future PRs. 1.05 deploys to production on `main`. The owed-verification items (real seasons render on the preview; the 5-item eyeball check) still stand and can be confirmed on the production preview.
+- **Links:** CLAUDE.md §Branch & PR rules, [[D-0.00-6]], [[D-1.02-6]], PR #4.

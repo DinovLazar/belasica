@@ -70,3 +70,16 @@ passed at all weights (see `brand.md` §Cyrillic gate).
 Config authority: `components.json` (shadcn: new-york, Tailwind v4, cssVariables, aliases
 `@/components`, `@/lib/utils`, `@/components/ui`). Design tokens live only in `brand.md` →
 `app/globals.css` `@theme`.
+
+## 2026-07-13 — Phase 1.05 install: Portable Text renderer (exact pinned, as shipped)
+Season/story write-ups are stored as Sanity Portable Text (`body`); the season page needs to
+render it. Added to the app (root `package.json`) dependencies, exact-pinned (no `^`/`~`/`latest`),
+installed with `npm install -E` under Node `22.23.1` (`.nvmrc`):
+- `@portabletext/react@6.2.0` — renders a Portable Text array to React; used by
+  `components/site/portable-text.tsx`, which maps blocks/marks to the `.type-*` scale + tokens
+  (no hardcoded hex/font). React 19-compatible; server component (zero client JS). The install
+  surfaces the same pre-existing `sanity`↔React-19 peer-dependency warnings noted in Known Issues
+  (transitive `@portabletext/editor` under `sanity`), not from this direct dep.
+- No new Studio deps. `season` schema gained `competition` (string) + `results` (array of the new
+  `matchResult` object); `npm run typegen` regenerated `lib/sanity/sanity.types.ts` (now 17 schema
+  types). `next build` + `eslint` pass on Node 22.23.1.
