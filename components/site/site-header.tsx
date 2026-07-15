@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, Search, Shield } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS, CLUB_NAME_PLACEHOLDER } from "./nav-items";
+import { NAV_ITEMS, CLUB_NAME } from "./nav-items";
+
+const FOCUS_RING =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 /**
  * Site header — editorial masthead + section nav bar.
@@ -16,6 +20,10 @@ import { NAV_ITEMS, CLUB_NAME_PLACEHOLDER } from "./nav-items";
  */
 export function SiteHeader({ activeHref }: { activeHref?: string }) {
   const [open, setOpen] = useState(false);
+  // The real crest is an owner-provided asset (public/crest.svg). Until it is
+  // committed, fall back to the placeholder badge — brand.md forbids drawing a
+  // fake crest. The <Image> renders the moment the file exists (D-1.06b-2).
+  const [crestReady, setCrestReady] = useState(true);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-primary/20 bg-surface">
@@ -24,16 +32,31 @@ export function SiteHeader({ activeHref }: { activeHref?: string }) {
         <div className="flex h-20 items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-3 transition-opacity hover:opacity-70"
+            className={cn(
+              "inline-flex items-center gap-2.5 transition-opacity hover:opacity-70",
+              FOCUS_RING,
+            )}
           >
-            {/* Crest placeholder — no verified crest asset yet (brand.md) */}
-            <span
-              aria-hidden
-              className="flex size-10 items-center justify-center rounded-full border border-outline/20 bg-primary-container text-on-primary"
-            >
-              <Shield className="size-5" />
-            </span>
-            <span className="type-title text-primary">{CLUB_NAME_PLACEHOLDER}</span>
+            {crestReady ? (
+              <Image
+                src="/crest.svg"
+                alt="" // decorative — the wordmark is the accessible name
+                width={32}
+                height={40}
+                unoptimized
+                onError={() => setCrestReady(false)}
+                className="h-8 w-auto"
+              />
+            ) : (
+              // Fallback badge until the real crest asset ships (brand.md).
+              <span
+                aria-hidden
+                className="flex size-10 items-center justify-center rounded-full border border-outline/20 bg-primary-container text-on-primary"
+              >
+                <Shield className="size-5" />
+              </span>
+            )}
+            <span className="type-title text-primary">{CLUB_NAME}</span>
           </Link>
 
           <div className="flex items-center gap-2">

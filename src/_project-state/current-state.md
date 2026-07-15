@@ -34,10 +34,12 @@ NEXT: reconcile the season/people detail & index routes to the LIVE Sanity conte
   live model directly; the **other routes still target the OLD model**, so `/arhiva`, `/legendi`,
   `/treneri-i-pretsedateli` show empty states and `/arhiva/[slug]` + `/licnost/[slug]` 404 against
   the live content (this is the NEXT phase).
-- Stubbed / not wired yet: About/Contact/Privacy pages arrive at 1.07. Club **name** is still an
-  unverified placeholder (P3) in the header/footer wordmark (the homepage does **not** assert it —
-  it renders the owner's published description, which names the club in prose, D-1.05.2-5); club
-  **colours** are set from the design but **pending Ace** (not VERIFIED).
+- Stubbed / not wired yet: About/Contact/Privacy pages arrive at 1.07. Club **name** is now
+  **VERIFIED "ФК Беласица"** (owner Lazar, 2026-07-15, D-1.06b-2) and renders in the header/footer
+  wordmark + the browser-tab title; the **crest asset** + favicon are still owed — the navbar is
+  wired to render `public/crest.svg` the moment it lands, with a graceful placeholder-badge
+  fallback until then (no fake crest was drawn, per `brand.md`). Club **colours** are set from the
+  design but **pending Ace** (not VERIFIED).
 - Current phase just closed: **Part 1 · Phase 1.05.2 — Homepage content-sync + three new sections**
   (out-of-sequence: brought the Home page forward and wired it to the live content). Executed on
   Lazar's MacBook (git user DinovLazar; Node 22.23.1 via the Homebrew keg). PR #5 (phase-1.06-people)
@@ -46,6 +48,15 @@ NEXT: reconcile the season/people detail & index routes to the LIVE Sanity conte
   `main` on the owner's instruction WITHOUT the Vercel preview gate (D-1.05.2-6)** — no preview was
   produced (the `.vercel` link is stale / project renamed to `belasica-v2`, auto-build off); the code
   was verified locally instead, and the preview eyeball check stays owed until Vercel is fixed.
+- **On top of 1.05.2, an out-of-sequence visual pass — Phase 1.06b (visual polish)** — was merged to
+  `main` via **PR #7** on the owner's instruction **without the Vercel preview gate** (D-1.06b-4,
+  mirroring D-1.05.2-6): the masthead was already sticky; the club
+  name is verified + rendered in the wordmark; the crest is wired (asset owed, fallback badge);
+  `site-footer.tsx` was rebuilt into four editorial columns (brand · Навигација · Контакт · Следете
+  нѐ) + a copyright bar, carrying **DEMO** contact/social values at the owner's instruction
+  (D-1.06b-1, launch blocker); and the homepage gallery became a 2×2 feature mosaic (D-1.06b-3).
+  `npm run build` + `npm run lint` pass on Node 22.23.1; header/gallery verified in the local dev
+  preview, footer verified structurally (DOM). No new dependencies.
 
 ## Detail
 
@@ -124,9 +135,11 @@ NEXT: reconcile the season/people detail & index routes to the LIVE Sanity conte
 
 | Where | What's needed | Blocked on |
 |---|---|---|
-| `components/site/site-header.tsx` + `site-footer.tsx` (wordmark) | Exact club name in Macedonian (`CLUB_NAME_PLACEHOLDER`) — visible on **every** page incl. the homepage header/footer. The homepage **body** does not assert the name (structural hero; the description names the club in prose, D-1.05.2-5) | P3 — confirm with Ace; recorded in `facts.md` |
-| `components/site/site-header.tsx` (crest badge) | A real club crest asset (circular placeholder badge for now) — visible on every page | Crest asset from Ace/Lazar |
+| `components/site/site-header.tsx` (crest) | A real club **crest asset** — commit `public/crest.svg` (renders in the navbar via `next/image`) **and** `app/icon.svg` (favicon), then delete `app/favicon.ico`. Until then the navbar shows a placeholder shield badge (graceful fallback, D-1.06b-2). No `[PLACEHOLDER:]` text token — a fallback graphic. | Crest asset file from Ace/Lazar |
+| `components/site/site-footer.tsx` (**DEMO data**, D-1.06b-1) | ⚠️ Fabricated **contact + social** values (`kontakt@fkbelasica-arhiva.mk`, `+389 70 000 000`, Facebook/Instagram/YouTube → `#`) shipped at the owner's instruction for the preview. **Not `[PLACEHOLDER:]` tokens — they look real.** Must be removed or replaced with VERIFIED values before cutover. | Verified contact/social from `facts.md` (P3, ask at 1.07) |
 | `components/site/photo-frame.tsx` (default) | Renders `[PLACEHOLDER: фотографија]` when a photo `src` is absent — now used on the homepage (hero/featured/legends/gallery); currently **all photos are present** so no placeholder renders; also shows on `/_preview` | Verified season/person photos where missing |
+
+*(The club-**name** wordmark placeholder is **resolved** — name VERIFIED "ФК Беласица", D-1.06b-2.)*
 
 *(`/_preview` is a `noindex` build artifact, not a launch page. The season page (1.05) adds **no** new
 placeholder tokens — missing content is handled by honest empty states, not `[PLACEHOLDER:]` markers.)*

@@ -273,7 +273,10 @@ export default async function Home() {
                     <li key={legend._id}>
                       <Link
                         href={`/licnost/${legend.slug}`}
-                        className={cn("group block", FOCUS_RING)}
+                        className={cn(
+                          "group block transition-transform hover:-translate-y-0.5",
+                          FOCUS_RING,
+                        )}
                       >
                         <PhotoFrame
                           src={sanityImageUrl(legend.portrait?.url, {
@@ -346,17 +349,28 @@ export default async function Home() {
               <Reveal>
                 <SectionOverline>Галерија</SectionOverline>
                 <h2 className="type-headline mt-5 text-primary">Од архивата</h2>
-                <div className="mt-10 grid grid-cols-2 gap-6 md:grid-cols-3">
-                  {gallery.map((photo, index) => (
-                    <PhotoFrame
-                      key={`${photo.caption ?? "photo"}-${index}`}
-                      src={sanityImageUrl(photo.url, { w: 800, h: 800 })}
-                      alt={photo.caption ?? ""}
-                      caption={photo.caption ?? undefined}
-                      date={photo.date ?? undefined}
-                      aspect="square"
-                    />
-                  ))}
+                {/* Editorial mosaic: the first photo is a 2×2 feature, the
+                    rest fill around it as square tiles. All tiles are square so
+                    the feature (a square at 2-col width) aligns to exactly two
+                    rows; captions ride as accessible `alt` because caption-below
+                    can't align inside a spanning grid (D-1.06b-3). Robust for
+                    any count — with one photo it's a lone feature. */}
+                <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+                  {gallery.map((photo, index) => {
+                    const feature = index === 0;
+                    return (
+                      <PhotoFrame
+                        key={`${photo.caption ?? "photo"}-${index}`}
+                        src={sanityImageUrl(photo.url, {
+                          w: feature ? 1200 : 800,
+                          h: feature ? 1200 : 800,
+                        })}
+                        alt={photo.caption ?? ""}
+                        aspect="square"
+                        className={feature ? "col-span-2 row-span-2" : undefined}
+                      />
+                    );
+                  })}
                 </div>
               </Reveal>
             </div>
