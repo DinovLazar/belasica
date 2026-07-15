@@ -58,8 +58,8 @@ All logged in `Decisions.md`:
 - `Decisions.md`, `src/_project-state/current-state.md`, `src/_project-state/file-map.md`.
 
 **Branch:** `phase-1.05.2-homepage-content-sync` (off merged `main`).
-**PR:** _added after push — see the follow-up commit / §7._
-**Preview (build gate):** _Vercel branch alias, added after push (canonical repo → auto-builds)._
+**PR:** https://github.com/DinovLazar/belasica/pull/6 — **merged to `main`** on the owner's instruction (D-1.05.2-6).
+**Preview (build gate):** ⚠️ **none produced.** The branch auto-build never fired and the repo's `.vercel` link points to the now-deleted `belasica` project (active project is **`belasica-v2`**, wiring mid-transition). Per the owner's explicit "merge to main", PR #6 was merged **without** the preview gate (D-1.05.2-6); the code was verified locally instead (§2). The preview eyeball check remains owed once the Vercel setup is fixed (owed-verification register).
 
 ## 6. State updates done
 

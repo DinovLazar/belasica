@@ -42,7 +42,10 @@ NEXT: reconcile the season/people detail & index routes to the LIVE Sanity conte
   (out-of-sequence: brought the Home page forward and wired it to the live content). Executed on
   Lazar's MacBook (git user DinovLazar; Node 22.23.1 via the Homebrew keg). PR #5 (phase-1.06-people)
   was merged first on the owner's instruction (one-off override, D-1.06-6) to satisfy the one-branch
-  rule. Prior phase (1.06 — People templates) is merged to `main`.
+  rule. Prior phase (1.06 — People templates) is merged to `main`. **PR #6 (this phase) was merged to
+  `main` on the owner's instruction WITHOUT the Vercel preview gate (D-1.05.2-6)** — no preview was
+  produced (the `.vercel` link is stale / project renamed to `belasica-v2`, auto-build off); the code
+  was verified locally instead, and the preview eyeball check stays owed until Vercel is fixed.
 
 ## Detail
 
