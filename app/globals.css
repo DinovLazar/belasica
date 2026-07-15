@@ -165,3 +165,40 @@
     }
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Reveal-on-scroll (Phase 1.05.2) — transform + opacity only. JS toggles
+   `.is-visible` via IntersectionObserver (components/home/reveal.tsx). Content
+   is visible instantly — never hidden — when motion is reduced OR scripting is
+   unavailable (no-JS / crawlers), so nothing is withheld from any reader.
+   ───────────────────────────────────────────────────────────────────────── */
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 600ms ease,
+      transform 600ms ease;
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+  @media (scripting: none) {
+    .reveal,
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}

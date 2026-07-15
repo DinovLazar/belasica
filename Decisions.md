@@ -285,3 +285,54 @@
 - **Finding (out of 1.06 scope — flagged to Lazar):** an anonymous CDN read of `production` returns **HTTP 200 with results** — published docs are readable without a token. D-1.02-2 records both datasets as *private* precisely so "anyone with the project ID" cannot read unverified research. With zero content today there is **no** exposure; but once published-but-`verified:false` docs exist they could be anonymously readable via raw GROQ, bypassing the intended **dataset-level** protection. (The site's `verified == true` query gate still holds — the gap is the dataset ACL, not the site.) Changing dataset visibility is a security-setting change and Lazar's call — **not** touched here.
 - **Alternatives considered:** Ask the owner to paste the read token / write `.env.local` — declined (secret handling; unnecessary once the anonymous read sufficed). `vercel env pull` — no `.vercel` link on this machine.
 - **Links:** [[D-1.02-2]], [[D-1.02-3]], lib/sanity/client.ts, lib/sanity/queries.ts.
+
+### D-1.06-6 · 2026-07-15 · One-off owner override to merge PR #5 (phase 1.06)
+- **Status:** Accepted — owner call (in-session instruction "merge it").
+- **Context:** CLAUDE.md §Branch & PR rules — "Never merge your own PR. Lazar reviews the Vercel preview and merges." Phase 1.05.2's precondition is one-branch-at-a-time: the prior phase's PR merged before a new branch. PR #5 (`phase-1.06-people`, opened from Petar's fork) was still open, blocking a clean 1.05.2 branch, and the executing agent cannot merge its own PR by rule.
+- **Decision:** On the owner's explicit instruction, merged PR #5 into `main` via a merge commit (`gh pr merge 5 --merge`) — mirroring D-1.05-3, the identical one-off override logged for PR #4.
+- **Alternatives considered:** Wait for the owner to merge manually — declined; the owner asked the agent to do it.
+- **Consequences:** `main` now contains 1.06; `phase-1.05.2-homepage-content-sync` was branched from the merged `main`. The "never merge own PR" default remains in force — this is a logged exception, not a new default.
+- **Links:** [[D-1.05-3]], CLAUDE.md §Branch & PR rules.
+
+### D-1.05.2-1 · 2026-07-15 · Homepage renders published content WITHOUT the `verified` gate (new content model)
+- **Status:** Accepted — owner call. **Supersedes D-1.02-2's query-level gate for the homepage / new model only.**
+- **Context:** The live `production` content model changed and no longer carries a `verified` field (verified 2026-07-15: 0 docs with `verified == true`; the live docs are `siteSettings` + a new `photo` type + new `season`/`person` shapes). CLAUDE.md §Content truth and `lib/sanity/queries.ts` THE RULE require `verified == true` to render — which against this model renders **nothing**, which is exactly the placeholder bug the phase exists to fix.
+- **Decision:** The homepage queries the published content directly, with **no** `verified` filter. Publication in `production` (controlled by Lazar/Ace) is treated as the approval for this model. Implemented in a **new** module `lib/sanity/home.ts` with the exception documented in-file; `queries.ts` and its `VERIFIED_FILTER` are untouched, so `npm run check:gate` still passes for the legacy typed queries.
+- **Alternatives considered:** Compose `verified == true` (page stays all placeholders); re-add `verified` to the docs in Studio first (owner declined — the content is owner-published and needed for the Ace demo now).
+- **Consequences:** The verified gate no longer governs the homepage. If unverified research is later published in this model, it **would** render on the homepage — the gate must be reintroduced (or the model reconciled) before that happens. Legacy typed routes keep the gate.
+- **Links:** [[D-1.02-2]], lib/sanity/home.ts, lib/sanity/queries.ts, CLAUDE.md §Content truth.
+
+### D-1.05.2-2 · 2026-07-15 · Homepage queries reconciled to the LIVE content model (schema drift acknowledged)
+- **Status:** Accepted (forced by reality; the brief directed "reconcile against the live model").
+- **Context:** The repo's Studio schema (`sanity/schemaTypes/*`) + TypeGen (`sanity.types.ts`) + `queries.ts` target `season.label`/`person.fullName` and have no `photo`/`siteSettings` types. The live `production` documents use a **different, newer** model (`siteSettings`; `season.title`/`decade`/`story`/`squad`/`trainers`; `person.name`/`role`/`playingYears`; `photo.image`/`caption`/`date`/`provenance`/`relatedPerson`/`relatedSeason`). `get_schema` still returns the OLD shape — the live documents were entered against a Studio schema never committed to this repo.
+- **Decision:** The homepage reads the live model via a hand-typed GROQ query in `lib/sanity/home.ts` (TypeGen can't type it). Per scope, `sanity/schemaTypes/*` is **not** edited and no content is created. Images use `image.asset->url` + a dep-free CDN-param helper (`lib/sanity/image.ts`) — `@sanity/image-url` is only a transitive dep and adding a dependency is out of scope.
+- **Consequences:** The homepage is correct against live content, but the detail/index routes (`/arhiva`, `/arhiva/[slug]`, `/legendi`, `/treneri-i-pretsedateli`, `/licnost/[slug]`) still use the old gated queries and render empty/404 against the new model — so links **from** the homepage into them 404/empty until a follow-up reconciles those routes (or realigns the Studio schema + `verified`). Flagged as the recommended next phase.
+- **Links:** [[D-1.05.2-1]], lib/sanity/home.ts, lib/sanity/image.ts.
+
+### D-1.05.2-3 · 2026-07-15 · Brand/token & IA reconciliations (brief written against stale vocabulary)
+- **Status:** Accepted (`brand.md` is the locked authority; brief reconciled to reality).
+- **Context:** The brief referenced tokens/paths/routes that don't match the repo: "Navy #12294F / Paper #F7F4EC / Orange #E4741C", `src/app/(site)/page.tsx`, `src/components/home/`, `src/sanity/`, legend links `/legendi/{slug}`.
+- **Decision:** Mapped to locked `brand.md` + the real repo — the one accent is brick `secondary` #A03F32 (**there is no orange token**; "orange" → `secondary`); paper #F7F4EE; navy #002766. Real paths `app/page.tsx`, `lib/sanity/`, `components/home/`. Legend cards link to the canonical profile `/licnost/{slug}` (D-1.06-2), not `/legendi/{slug}`. Explore-grid cards link `/arhiva /legendi /statistika /za-nas` — the existing site IA (`nav-items.ts` already links `/statistika` + `/za-nas`, which arrive in later phases). Timeline markers are **sharp squares** (brand.md: 0px corners everywhere; "small sharp secondary boxes" for markers), not circles.
+- **Consequences:** Zero hardcoded hex/fonts outside `globals.css`; on-brand and consistent with existing pages.
+- **Links:** brand.md, [[D-1.06-2]], components/site/nav-items.ts.
+
+### D-1.05.2-4 · 2026-07-15 · Homepage components created + PhotoFrame extended (brief assumed pre-existing helpers)
+- **Status:** Accepted (self-made; the brief's named reusables didn't exist).
+- **Context:** The brief said to reuse `PhotoFrame`, `PlaceholderChip`, `Reveal`, `SectionOverline` and extend "existing homepage sections 1–5" — but `app/page.tsx` was the 1.01 stub, only `PhotoFrame` existed, and there was no Reveal CSS/component, no home components, no `HOME_QUERY`.
+- **Decision:** Built sections 1–8 from scratch and created `components/home/{reveal,section-overline,placeholder-chip}.tsx`. `Reveal` = a dep-free client wrapper (IntersectionObserver, syncs the DOM directly — no React state, so no setState-in-effect) + `.reveal` CSS in `globals.css`; content shows **instantly** under `prefers-reduced-motion` and `scripting: none` (no-JS), and reveals elements already above the viewport on reload/back-nav. Extended the shared `PhotoFrame` with an optional, additive `date` prop (a brick date overline above the caption) for the gallery — backwards compatible.
+- **Consequences:** New folder `components/home/`; `globals.css` gains the `.reveal` rules; `PhotoFrame` gains `date?`. No new dependency.
+- **Links:** components/home/reveal.tsx, app/globals.css, components/site/photo-frame.tsx.
+
+### D-1.05.2-5 · 2026-07-15 · Club name stays P3-gated; owner's published description rendered verbatim
+- **Status:** Accepted (self-made; honors facts.md P3 + 1.03 handover §8 alongside D-1.05.2-1).
+- **Context:** `facts.md` keeps the exact club name UNVERIFIED (P3); the 1.03 handover §8 and the header/footer wordmark keep it as `CLUB_NAME_PLACEHOLDER`. D-1.05.2-1 greenlit rendering the published Sanity content, which includes `siteSettings.description` — a paragraph that names the club in prose.
+- **Decision:** Render `siteSettings.description` verbatim as the Intro (owner-published editorial prose). Do **not** assert the club name as homepage chrome: the hero heading is structural ("Историјата на клубот"), and the header/footer wordmark placeholder is untouched (out of scope). The club name therefore appears only inside the owner's own paragraph, never as an independent site claim.
+- **Consequences:** The homepage is coherent with the still-gated wordmark; no `facts.md` P3 override.
+- **Links:** facts.md, [[D-1.05.2-1]], docs/design-handovers/Part-1-Phase-1.03-Handover.md.
+
+### D-1.05.2-6 · 2026-07-15 · Owner override to merge PR #6 to `main` without the Vercel preview gate
+- **Status:** Accepted — owner instruction ("merge to main"), **informed** (the owner was told the preview was unavailable and why).
+- **Context:** CLAUDE.md §Branch & PR rules make the Vercel preview the sole review gate ("the preview is the only gate"). For PR #6 **no preview was produced**: the branch auto-build never fired, and the repo's `.vercel` link points to a now-deleted `belasica` project — the active project is **`belasica-v2`**, whose repo/env wiring is mid-transition (Lazar's domain). The code was instead verified locally end-to-end: `build` + `lint` pass, the live content renders (description, 1992/93 season + story, 2 legend players + portraits, 8 gallery photos), **13/13 images loaded**, the 1990s timeline highlight confirmed via computed styles, reduced-motion + no-JS reveal fallbacks present, page 8234px.
+- **Decision:** On the owner's explicit instruction, merged PR #6 into `main` (`gh pr merge 6 --merge`) **without** the preview review. Mirrors the merge-override precedent (D-1.05-3, D-1.06-6). The executing agent does not merge as a rule — this is a logged, informed owner override.
+- **Consequences:** The homepage ships to `main` (→ Vercel production once the project wiring is fixed). The **preview eyeball check remains owed** (owed-verification register) and should run on the fixed Vercel setup. The Vercel infra drift (stale `.vercel` link; `belasica` → `belasica-v2` rename; branch auto-build off) is a standing follow-up for Lazar.
+- **Links:** [[D-1.06-6]], [[D-1.05-3]], CLAUDE.md §Branch & PR rules.
