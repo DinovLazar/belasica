@@ -130,6 +130,7 @@ export type Person = {
     _type: "block";
     _key: string;
   }>;
+  yearsAtClub?: string;
   source: string;
   verified?: boolean;
 };
@@ -362,7 +363,7 @@ export type ALL_PEOPLE_QUERY_RESULT = Array<{
 
 // Source: ../lib/sanity/queries.ts
 // Variable: PERSON_BY_SLUG_QUERY
-// Query: *[_type == "person" && verified == true && slug.current == $slug][0]{    _id, fullName, "slug": slug.current, roles, bio  }
+// Query: *[_type == "person" && verified == true && slug.current == $slug][0]{    _id, fullName, "slug": slug.current, roles, bio, yearsAtClub  }
 export type PERSON_BY_SLUG_QUERY_RESULT = {
   _id: string;
   fullName: string;
@@ -386,6 +387,7 @@ export type PERSON_BY_SLUG_QUERY_RESULT = {
     _type: "block";
     _key: string;
   }> | null;
+  yearsAtClub: string | null;
 } | null;
 
 // Source: ../lib/sanity/queries.ts
@@ -422,7 +424,7 @@ declare module "@sanity/client" {
     '*[_type == "season" && verified == true] | order(startYear asc){\n    _id, label, startYear, "slug": slug.current\n  }': ALL_SEASONS_QUERY_RESULT;
     '*[_type == "season" && verified == true && slug.current == $slug][0]{\n    _id, label, startYear, "slug": slug.current, competition, body,\n    results[]{ round, date, opponent, venue, goalsFor, goalsAgainst }\n  }': SEASON_BY_SLUG_QUERY_RESULT;
     '*[_type == "person" && verified == true] | order(fullName asc){\n    _id, fullName, "slug": slug.current, roles\n  }': ALL_PEOPLE_QUERY_RESULT;
-    '*[_type == "person" && verified == true && slug.current == $slug][0]{\n    _id, fullName, "slug": slug.current, roles, bio\n  }': PERSON_BY_SLUG_QUERY_RESULT;
+    '*[_type == "person" && verified == true && slug.current == $slug][0]{\n    _id, fullName, "slug": slug.current, roles, bio, yearsAtClub\n  }': PERSON_BY_SLUG_QUERY_RESULT;
     '*[_type == "page" && verified == true && slug.current == $slug][0]{\n    _id, title, "slug": slug.current, body\n  }': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

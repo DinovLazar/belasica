@@ -49,7 +49,7 @@ export const ALL_PEOPLE_QUERY = defineQuery(
 
 export const PERSON_BY_SLUG_QUERY = defineQuery(
   `*[_type == "person" && ${VERIFIED_FILTER} && slug.current == $slug][0]{
-    _id, fullName, "slug": slug.current, roles, bio
+    _id, fullName, "slug": slug.current, roles, bio, yearsAtClub
   }`,
 )
 
