@@ -48,8 +48,9 @@ NEXT: reconcile the season/people detail & index routes to the LIVE Sanity conte
   `main` on the owner's instruction WITHOUT the Vercel preview gate (D-1.05.2-6)** — no preview was
   produced (the `.vercel` link is stale / project renamed to `belasica-v2`, auto-build off); the code
   was verified locally instead, and the preview eyeball check stays owed until Vercel is fixed.
-- **On top of 1.05.2, an out-of-sequence visual pass — Phase 1.06b (visual polish)** — is on branch
-  `phase-1.06b-visual-polish` (**PR open, not merged**): the masthead was already sticky; the club
+- **On top of 1.05.2, an out-of-sequence visual pass — Phase 1.06b (visual polish)** — was merged to
+  `main` via **PR #7** on the owner's instruction **without the Vercel preview gate** (D-1.06b-4,
+  mirroring D-1.05.2-6): the masthead was already sticky; the club
   name is verified + rendered in the wordmark; the crest is wired (asset owed, fallback badge);
   `site-footer.tsx` was rebuilt into four editorial columns (brand · Навигација · Контакт · Следете
   нѐ) + a copyright bar, carrying **DEMO** contact/social values at the owner's instruction

@@ -8,7 +8,7 @@
 - `CLAUDE.md` — Claude Code's standing rules (behavioral contract, <150 lines)
 - `facts.md` — verified club-level facts; the only legal source for factual claims
 - `brand.md` — design tokens + brand rules; the only token source (**LOCKED 2026-07-13** — Stitch "Archive Editorial")
-- `Decisions.md` — append-only decision log (through D-1.06b-3)
+- `Decisions.md` — append-only decision log (through D-1.06b-4)
 - `components.json` — shadcn/ui config (new-york, Tailwind v4, css `app/globals.css`, aliases)
 - `.nvmrc` — pinned Node version (22.23.1)
 - `.gitignore` — ignores node_modules, .next, .vercel, .env*, .DS_Store, .claude, etc.
