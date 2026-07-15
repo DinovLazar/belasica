@@ -21,6 +21,7 @@ export function PhotoFrame({
   src,
   alt,
   caption,
+  date,
   aspect = "video",
   align = "center",
   className,
@@ -28,6 +29,8 @@ export function PhotoFrame({
   src?: string;
   alt?: string;
   caption?: string;
+  /** Optional date overline shown above the caption (Inter, brick). */
+  date?: string;
   aspect?: keyof typeof ASPECT | string;
   align?: "left" | "center" | "right";
   className?: string;
@@ -55,9 +58,16 @@ export function PhotoFrame({
           )}
         </div>
       </div>
-      {caption ? (
-        <figcaption className={cn("type-caption mt-3 uppercase text-on-surface-variant", alignClass)}>
-          {caption}
+      {caption || date ? (
+        <figcaption className={cn("mt-3", alignClass)}>
+          {date ? (
+            <span className="type-caption block uppercase text-secondary">{date}</span>
+          ) : null}
+          {caption ? (
+            <span className="type-caption block uppercase text-on-surface-variant">
+              {caption}
+            </span>
+          ) : null}
         </figcaption>
       ) : null}
     </figure>

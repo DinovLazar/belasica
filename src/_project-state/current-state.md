@@ -1,4 +1,4 @@
-NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
+NEXT: reconcile the season/people detail & index routes to the LIVE Sanity content model — `/arhiva`, `/arhiva/[slug]`, `/legendi`, `/treneri-i-pretsedateli`, `/licnost/[slug]` still use the OLD gated queries (`season.label`/`person.fullName` + `verified==true`) and render empty/404 against the live content, so the new homepage's links into them break (D-1.05.2-2). Then Part 1 · Phase 1.07 — About / Contact / Privacy (the Home page shipped early in 1.05.2).
 
 # current-state.md — Belasica
 
@@ -18,22 +18,31 @@ NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
   *president*), plus a single **canonical profile at `/licnost/[slug]`** shared by both sections
   (hero name + role labels, Portable Text bio, a details aside with Улога(и) + Години во клубот). The
   `season` model carries a structured **`results`** list + optional **`competition`**; the `person`
-  model gains an optional **`yearsAtClub`** label. The data layer still returns **only
-  `verified == true`** documents, so unverified research renders nowhere.
-- Stubbed / not wired yet: Home/About/Contact/Privacy pages arrive at 1.07. The public homepage `/`
-  is still the 1.01 placeholder. No real club content is entered yet — `production` holds **zero**
-  content documents by design, so `/arhiva`, `/legendi` and `/treneri-i-pretsedateli` currently render
-  their empty states, and the season and profile pages are proven templates awaiting verified
-  documents (entered by a human via the Studio, flipped `verified` by Lazar/Ace). Club **name** is
-  still an unverified placeholder (P3); club **colours** are set from the design but **pending Ace**
-  (not VERIFIED).
-- Current phase just closed: Part 1 · Phase 1.06 — People templates (Legends / Trainers & Presidents
-  index pages + shared canonical profile + `person` schema `yearsAtClub` + role-label helpers).
-  Next up: Home / About / Contact / Privacy (1.07). **Executed on Petar's MacBook, not the
-  brief-named Lazar's — owner-approved override, D-1.06-3.** PR into `main`:
-  https://github.com/DinovLazar/belasica/pull/5 (opened from a fork — Petar lacks push access to
-  the canonical repo; Vercel won't auto-build a fork preview, so the branch must be pushed to the
-  canonical repo for the review preview — see the PR body). Awaiting Lazar's review + merge.
+  model gains an optional **`yearsAtClub`** label. These legacy typed queries (`queries.ts`) still
+  return **only `verified == true`** documents.
+- **The public homepage `/` is now a live, content-driven page (1.05.2):** 8 Macedonian editorial
+  sections — hero, intro (`siteSettings.description`), featured 1992/93 season + story, a decades
+  timeline (1920→2020, populated decades lit brick), legend players with portraits, a full-bleed
+  photo band, a photo gallery, and an explore grid. It reads the **LIVE** Sanity model via
+  `lib/sanity/home.ts` **without** the `verified` gate (the new model dropped that field — owner
+  decision D-1.05.2-1), so it renders real published content.
+- **Content model has drifted (D-1.05.2-2):** `production` is **no longer empty** — it holds real
+  published docs in a **newer** model than `sanity/schemaTypes/*` / TypeGen / `queries.ts`:
+  `siteSettings`, a `photo` type, `season.title/decade/story/squad/trainers`,
+  `person.name/role/playingYears`. The **deployed** schema (`get_schema`) still returns the OLD
+  shape — the docs were entered against a Studio schema never committed here. The homepage reads the
+  live model directly; the **other routes still target the OLD model**, so `/arhiva`, `/legendi`,
+  `/treneri-i-pretsedateli` show empty states and `/arhiva/[slug]` + `/licnost/[slug]` 404 against
+  the live content (this is the NEXT phase).
+- Stubbed / not wired yet: About/Contact/Privacy pages arrive at 1.07. Club **name** is still an
+  unverified placeholder (P3) in the header/footer wordmark (the homepage does **not** assert it —
+  it renders the owner's published description, which names the club in prose, D-1.05.2-5); club
+  **colours** are set from the design but **pending Ace** (not VERIFIED).
+- Current phase just closed: **Part 1 · Phase 1.05.2 — Homepage content-sync + three new sections**
+  (out-of-sequence: brought the Home page forward and wired it to the live content). Executed on
+  Lazar's MacBook (git user DinovLazar; Node 22.23.1 via the Homebrew keg). PR #5 (phase-1.06-people)
+  was merged first on the owner's instruction (one-off override, D-1.06-6) to satisfy the one-branch
+  rule. Prior phase (1.06 — People templates) is merged to `main`.
 
 ## Detail
 
@@ -62,7 +71,7 @@ NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
   Играч/Тренер/Претседател, single source) and **`people-list.tsx`** (`PeopleList` — alphabetical
   hairline grid of person links to `/licnost/[slug]`; renders only the verified list it is given).
   Icons: `lucide-react`.
-- **Routes:** `/` (static, unchanged 1.01 placeholder), `/_not-found` (static), `/_preview` (static,
+- **Routes:** `/` (static — **live homepage, 1.05.2**: 8 sections from `getHomeData()` against the live content model), `/_not-found` (static), `/_preview` (static,
   `noindex`, internal — folder `app/%5Fpreview/`, D-1.04-5), `/api/revalidate` (dynamic webhook target),
   and **new in 1.05: `/arhiva`** (static decade index — header/footer wired) and **`/arhiva/[slug]`**
   (SSG via `generateStaticParams()` from `getAllSeasons()`; `notFound()` on unknown/unverified slug;
@@ -90,9 +99,12 @@ NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
   → `/api/revalidate`. `npm run check:gate` passes (only verified docs return).
 - **Secrets:** `SANITY_API_READ_TOKEN` (Viewer) + `SANITY_REVALIDATE_SECRET` in `.env.local`
   (git-ignored) and Vercel. `.env.example` lists variable names only. No secrets in the repo.
-- **Content:** none in the repo (code only). `production` has **0 content documents** → `/arhiva` shows
-  its empty state; the season page renders only from a verified `season` doc (none yet). `facts.md` has
-  no VERIFIED club facts; club colours recorded as owner-selected (Stitch), pending Ace.
+- **Content:** none in the repo (code only). `production` now holds **real published content**
+  (verified 2026-07-15: 1 `siteSettings`, 1 `season` [1992/93], 5 `person`, 8 `photo`) in the **new**
+  model (D-1.05.2-2) — the homepage renders it. These docs carry **no `verified` field**, so the
+  legacy gated routes (`/arhiva`, `/legendi`, `/treneri-i-pretsedateli`) still show empty states and
+  `/arhiva/[slug]` + `/licnost/[slug]` 404 against them (NEXT phase). `facts.md` has no VERIFIED club
+  facts; club colours recorded as owner-selected (Stitch), pending Ace.
 - **Vercel:** project `belasica` on `dinovlazars-projects`; `main` → production, every branch → preview
   (previews team-protected, D-1.01-6).
 - **CI:** none (D-0.00-6). Review gate = Vercel preview + completion report; Lazar merges.
@@ -109,10 +121,9 @@ NEXT: Part 1 · Phase 1.07 — Home / About / Contact / Privacy pages (Code)
 
 | Where | What's needed | Blocked on |
 |---|---|---|
-| `app/page.tsx` (homepage) | Exact club name in Macedonian | P3 (confirm with Ace); recorded in `facts.md` |
-| `components/site/site-header.tsx` + `site-footer.tsx` (wordmark) | Exact club name in Macedonian (`CLUB_NAME_PLACEHOLDER`) — **now visible on the shipped `/arhiva` and season pages** | P3 — same fact as above |
-| `components/site/site-header.tsx` (crest badge) | A real club crest asset (circular placeholder badge for now) — **now visible on `/arhiva` and season pages** | Crest asset from Ace/Lazar |
-| `components/site/photo-frame.tsx` (default) | Renders `[PLACEHOLDER: фотографија]` when no photo `src` — **not yet placed on any public page** (photos are 2.05); appears only on `/_preview` | Verified season/person photos (2.05) |
+| `components/site/site-header.tsx` + `site-footer.tsx` (wordmark) | Exact club name in Macedonian (`CLUB_NAME_PLACEHOLDER`) — visible on **every** page incl. the homepage header/footer. The homepage **body** does not assert the name (structural hero; the description names the club in prose, D-1.05.2-5) | P3 — confirm with Ace; recorded in `facts.md` |
+| `components/site/site-header.tsx` (crest badge) | A real club crest asset (circular placeholder badge for now) — visible on every page | Crest asset from Ace/Lazar |
+| `components/site/photo-frame.tsx` (default) | Renders `[PLACEHOLDER: фотографија]` when a photo `src` is absent — now used on the homepage (hero/featured/legends/gallery); currently **all photos are present** so no placeholder renders; also shows on `/_preview` | Verified season/person photos where missing |
 
 *(`/_preview` is a `noindex` build artifact, not a launch page. The season page (1.05) adds **no** new
 placeholder tokens — missing content is handled by honest empty states, not `[PLACEHOLDER:]` markers.)*
@@ -125,7 +136,8 @@ placeholder tokens — missing content is handled by honest empty states, not `[
 |---|---|---|
 | Open the deployed Studio (https://belasica.sanity.studio/), sign in, confirm the document types show Macedonian labels, a new Season/Person has `verified` **off** by default, and the new fields render with Macedonian labels — `season` `competition` + `results` (match), and `person` **`yearsAtClub`** ("Години во клубот") | Lazar | 1.02 / 1.05 / 1.06 |
 | Ace confirms the club colours are historically correct → flip `facts.md` colours to VERIFIED | Ace (via Lazar) | 1.04 |
-| Templated pages (season, **profile**, and later home) prove their with-verified-content render once ≥1 verified document of each type exists — confirmed by Lazar on the PR preview at/after the 2.01 ingestion pilot, including the 5-item eyeball checklist per page | Lazar | 1.05 / 1.06 |
+| Templated pages (season, **profile**) prove their with-content render — **superseded for the homepage** (1.05.2 already renders real content), still owed for `/arhiva/[slug]` + `/licnost/[slug]` once those routes are reconciled to the live model | Lazar | 1.05 / 1.06 |
+| Confirm the **homepage** (1.05.2) on the PR preview: the 6-item eyeball checklist — hero, intro text, featured story, one real portrait, 1990s timeline highlight, explore grid — renders against the live content | Lazar | 1.05.2 |
 
 *(The last item is the standing real-content proof for every templated page — a season or profile page
 with real, verified data can only be confirmed once content exists (`production` holds zero content
@@ -137,8 +149,10 @@ decision Lazar owes.**)*
 
 ## Known issues
 
-- `production` shows documents to `count(*[])` that are all Sanity **system** docs under the reserved
-  `_.**` path — **zero content documents**. Every dataset has these.
+- `production` now holds **real content documents** (1 `siteSettings`, 1 `season`, 5 `person`,
+  8 `photo` as of 2026-07-15) alongside the usual Sanity **system** docs (reserved `_.**` path). The
+  homepage reads these; the earlier "zero content documents" snapshot is obsolete. **Note the model
+  drift (D-1.05.2-2):** these docs use a newer shape than the deployed schema / TypeGen / `queries.ts`.
 - `npm run check:gate` prints a benign Node `MODULE_TYPELESS_PACKAGE_JSON` warning; the proof still
   passes (exit 0).
 - Install shows peer-dependency override warnings (Sanity 6 + React 19); adding `@portabletext/react@6.2.0`
@@ -149,9 +163,10 @@ decision Lazar owes.**)*
   (App Router private-folder escape, D-1.04-5), not a typo.
 - **`production` serves anonymous published reads (security follow-up, D-1.06-5).** An unauthenticated
   CDN query of `production` returns HTTP 200 with results — i.e. published docs are readable without a
-  token, contrary to D-1.02-2's "both datasets private". No exposure today (`production` holds zero
-  content documents), but once published-but-`verified:false` research exists it could be read via raw
-  GROQ by anyone with the public project id, bypassing the intended **dataset-level** gate. The site's
-  `verified == true` **query** gate is unaffected. Fixing this is a Sanity dataset-visibility change —
-  Lazar's call — and was **not** made here (a security-setting change out of 1.06 scope). Surfaced by
-  the 1.06 local build, which relied on this anonymous read (no `.env.local` on Petar's machine).
+  token, contrary to D-1.02-2's "both datasets private". This is now **load-bearing**: the live
+  homepage (1.05.2) relies on public reads of `production`, and real content now exists there. Today's
+  content is owner-curated real material (no unverified research), so there is no exposure yet — but
+  once published-but-`verified:false` research exists it could be read via raw GROQ by anyone with the
+  public project id, bypassing the intended **dataset-level** gate. Also note the homepage renders
+  content **without** a `verified` query gate (D-1.05.2-1), so that query-level backstop no longer
+  covers `/`. Fixing the dataset ACL is a Sanity visibility change — Lazar's call — not made here.

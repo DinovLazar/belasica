@@ -25,8 +25,8 @@
 
 ## Application code
 - `app/layout.tsx` — root layout: `<html lang="mk">` + font variables (Source Serif 4 + Inter, cyrillic subset via `next/font`); metadata title `Белазица — архива`
-- `app/page.tsx` — placeholder homepage `/` (two Macedonian lines; club-name placeholder) — unchanged since 1.01
-- `app/globals.css` — **the token implementation**: Tailwind v4 `@theme` (Archive Editorial colours + shadcn aliases + font tokens), `.type-*` typography scale, `.editorial-container`, base paper/ink styling. Mirrors `brand.md`.
+- `app/page.tsx` — homepage `/` (1.05.2): 8 editorial sections from the LIVE Sanity model via `getHomeData()` — hero, intro (`siteSettings.description`), featured season, decades timeline, legends, photo band, gallery, explore grid; renders published content **without** the verified gate (D-1.05.2-1)
+- `app/globals.css` — **the token implementation**: Tailwind v4 `@theme` (Archive Editorial colours + shadcn aliases + font tokens), `.type-*` typography scale, `.editorial-container`, base paper/ink styling, `.reveal` scroll-in rules (reduced-motion / `scripting:none` safe, 1.05.2). Mirrors `brand.md`.
 - `app/%5Fpreview/page.tsx` — internal component preview at URL `/_preview` (`noindex`, not in nav); shows type scale, colours, Cyrillic gate, buttons, results table, cards, photo frames (`%5F` = escaped underscore, D-1.04-5)
 - `app/arhiva/page.tsx` — decade index at `/arhiva`: verified seasons grouped by decade (hairline grid), honest Macedonian empty state; header active on `/arhiva` (1.05)
 - `app/arhiva/[slug]/page.tsx` — season page at `/arhiva/[slug]`: `generateStaticParams` + `notFound()`; hero (label + competition), Portable Text write-up, `<ResultsTable>`, 12-col layout with details aside (1.05)
@@ -45,7 +45,10 @@
 - `components/site/site-header.tsx` — sticky masthead + section nav (desktop bar / mobile drawer); `activeHref` prop; crest + club-name placeholders
 - `components/site/site-footer.tsx` — footer: wordmark placeholder, section links + `Приватност` stub, honest `© 2026` line (no unverified founding year)
 - `components/site/results-table.tsx` — `ResultsTable` (typed `MatchResult[]`; outcome-coloured score cell); never invents data
-- `components/site/photo-frame.tsx` — `PhotoFrame` matted historical-photo treatment (grayscale→colour, caption; placeholder panel when no `src`)
+- `components/site/photo-frame.tsx` — `PhotoFrame` matted historical-photo treatment (grayscale→colour, caption; placeholder panel when no `src`); optional `date` overline prop (1.05.2)
+- `components/home/reveal.tsx` — `Reveal` scroll-in wrapper (client; IntersectionObserver → `.is-visible`; syncs the DOM directly, no React state; instant under reduced-motion / no-JS; reveals above-viewport elements on reload) (1.05.2)
+- `components/home/section-overline.tsx` — `SectionOverline`: brick rule + uppercase Inter eyebrow label above section headings (1.05.2)
+- `components/home/placeholder-chip.tsx` — `PlaceholderChip`: renders a registered `[PLACEHOLDER: …]` chip for an absent required display fact (1.05.2)
 - `components/site/portable-text.tsx` — `PortableTextBody`: renders a Portable Text `body` array to the `.type-*` scale + tokens (blocks, marks, links, lists); server component, `@portabletext/react` (1.05)
 - `components/site/person-roles.ts` — role vocabulary + helpers (`ROLE_LABELS`, `roleLabel`, `roleLabels`): maps `player/trainer/president` → Играч/Тренер/Претседател, joins multi-role labels in canonical order; single source shared by both people indexes + the profile (1.06)
 - `components/site/people-list.tsx` — `PeopleList`: alphabetical hairline grid of person links to `/licnost/[slug]` (name + role label(s)); renders only the verified, role-filtered list the page supplies — never invents/sorts/filters (1.06)
@@ -54,6 +57,8 @@
 - `lib/sanity/client.ts` — configured Sanity read client (env-driven, pinned apiVersion, server-only token) + `sanityFetch` helper
 - `lib/sanity/queries.ts` — the 5 GROQ queries via `defineQuery`, all composing the exported `VERIFIED_FILTER`; tagged fetchers matching the webhook (`SEASON_BY_SLUG_QUERY` projects `competition` + `results` as of 1.05; `PERSON_BY_SLUG_QUERY` projects `yearsAtClub` as of 1.06)
 - `lib/sanity/sanity.types.ts` — **generated** by Sanity TypeGen (`npm run typegen`); committed; imported by `queries.ts`
+- `lib/sanity/home.ts` — homepage data for the LIVE content model (`getHomeData` + `HOME_QUERY` + hand-written types); reads `siteSettings`/`season`/`person`/`photo` **without** `VERIFIED_FILTER` (new model has no `verified` field, D-1.05.2-1); separate from `queries.ts` so the legacy gate stays intact (1.05.2)
+- `lib/sanity/image.ts` — dep-free Sanity CDN image-URL helper (`sanityImageUrl(url, {w,h,q,fit})` appends `?w=&h=&q=&fit=&auto=format` to `image.asset->url`); avoids adding `@sanity/image-url` (1.05.2)
 
 ## Scripts
 - `scripts/check-verified-gate.mjs` — verified-gate proof (`npm run check:gate`): writes to `test` only, asserts only verified docs return, cleans up
@@ -78,6 +83,7 @@
 - `briefs/Part-1-Phase-02-Code.md` — Phase 1.02 brief, committed verbatim
 - `docs/design-handovers/.gitkeep` — design handovers land here; read before any UI work
 - `docs/design-handovers/Part-1-Phase-1.03-Handover.md` — Archive Editorial handover: palette, type, spacing, layout + shared-component usage (read before 1.05/1.06)
+- `docs/design-handovers/Part-1-Phase-1.05.2-Homepage.md` — homepage layout note: the 8 shipped sections, image handling, and the cross-route model-drift gap (1.05.2)
 
 ## Project state (src/_project-state — not application code)
 - `src/_project-state/current-state.md` — live snapshot: NEXT line, registers, status
@@ -90,3 +96,4 @@
 - `src/_project-state/completions/Part-1-Phase-1.04-Completion.md` — Phase 1.04 completion report (layout + shared components)
 - `src/_project-state/completions/Part-1-Phase-1.05-Completion.md` — Phase 1.05 completion report (season archive templates)
 - `src/_project-state/completions/Part-1-Phase-1.06-Completion.md` — Phase 1.06 completion report (people templates: legends, trainers & presidents)
+- `src/_project-state/completions/Part-1-Phase-1.05.2-Completion.md` — Phase 1.05.2 completion report (homepage content-sync + 3 new sections)
