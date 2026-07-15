@@ -9,8 +9,9 @@
 
 | Fact | Value | Status |
 |---|---|---|
-| Exact club name (Macedonian) | — | UNVERIFIED — parallel track P3, confirm with Ace |
-| Founding year | — | UNVERIFIED — P3 |
+| Exact club name (Macedonian) | ФК Беласица | VERIFIED (owner Lazar, 2026-07-15) — supersedes the pending-Ace P3 hold (D-1.06b-2) |
+| Club crest | ФК Беласица emblem — owner-approved | VERIFIED (owner Lazar, 2026-07-15) — **asset file owed**: `public/crest.svg` + `app/icon.svg` not yet committed (D-1.06b-2) |
+| Founding year | — | UNVERIFIED — P3 (the crest's "1922" is **not** yet a verified founding-year claim) |
 | Stadium name | — | UNVERIFIED — P3 |
 | Current league / status | — | UNVERIFIED — P3 |
 | Club colours | Blue `#002766` + White `#FFFFFF` | owner-selected from Stitch design (2026-07-13) — PENDING Ace's confirmation of historical club colours (P3) · **not VERIFIED** |

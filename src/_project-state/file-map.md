@@ -8,7 +8,7 @@
 - `CLAUDE.md` — Claude Code's standing rules (behavioral contract, <150 lines)
 - `facts.md` — verified club-level facts; the only legal source for factual claims
 - `brand.md` — design tokens + brand rules; the only token source (**LOCKED 2026-07-13** — Stitch "Archive Editorial")
-- `Decisions.md` — append-only decision log (through D-1.06-5)
+- `Decisions.md` — append-only decision log (through D-1.06b-3)
 - `components.json` — shadcn/ui config (new-york, Tailwind v4, css `app/globals.css`, aliases)
 - `.nvmrc` — pinned Node version (22.23.1)
 - `.gitignore` — ignores node_modules, .next, .vercel, .env*, .DS_Store, .claude, etc.
@@ -24,8 +24,8 @@
 - `next-env.d.ts` — Next.js TS types (generated, git-ignored; not committed)
 
 ## Application code
-- `app/layout.tsx` — root layout: `<html lang="mk">` + font variables (Source Serif 4 + Inter, cyrillic subset via `next/font`); metadata title `Белазица — архива`
-- `app/page.tsx` — homepage `/` (1.05.2): 8 editorial sections from the LIVE Sanity model via `getHomeData()` — hero, intro (`siteSettings.description`), featured season, decades timeline, legends, photo band, gallery, explore grid; renders published content **without** the verified gate (D-1.05.2-1)
+- `app/layout.tsx` — root layout: `<html lang="mk">` + font variables (Source Serif 4 + Inter, cyrillic subset via `next/font`); metadata title `ФК Беласица — архива` (1.06b — typo fix + verified name)
+- `app/page.tsx` — homepage `/` (1.05.2): 8 editorial sections from the LIVE Sanity model via `getHomeData()` — hero, intro (`siteSettings.description`), featured season, decades timeline, legends, photo band, gallery, explore grid; renders published content **without** the verified gate (D-1.05.2-1). **1.06b:** gallery is a 2×2 feature mosaic (first photo `col-span-2 row-span-2`, captions as `alt`, D-1.06b-3); legend cards gain the 150ms card-lift hover
 - `app/globals.css` — **the token implementation**: Tailwind v4 `@theme` (Archive Editorial colours + shadcn aliases + font tokens), `.type-*` typography scale, `.editorial-container`, base paper/ink styling, `.reveal` scroll-in rules (reduced-motion / `scripting:none` safe, 1.05.2). Mirrors `brand.md`.
 - `app/%5Fpreview/page.tsx` — internal component preview at URL `/_preview` (`noindex`, not in nav); shows type scale, colours, Cyrillic gate, buttons, results table, cards, photo frames (`%5F` = escaped underscore, D-1.04-5)
 - `app/arhiva/page.tsx` — decade index at `/arhiva`: verified seasons grouped by decade (hairline grid), honest Macedonian empty state; header active on `/arhiva` (1.05)
@@ -41,9 +41,9 @@
 - `components/ui/button.tsx` — shadcn Button (CVA variants, sharp, uppercase tracked; token-driven)
 - `components/ui/card.tsx` — shadcn Card family (white surface, hairline border, sharp)
 - `components/ui/table.tsx` — shadcn Table primitives (no zebra, hairline rows, uppercase headers)
-- `components/site/nav-items.ts` — the 7 Macedonian section labels + hrefs + `CLUB_NAME_PLACEHOLDER`
-- `components/site/site-header.tsx` — sticky masthead + section nav (desktop bar / mobile drawer); `activeHref` prop; crest + club-name placeholders
-- `components/site/site-footer.tsx` — footer: wordmark placeholder, section links + `Приватност` stub, honest `© 2026` line (no unverified founding year)
+- `components/site/nav-items.ts` — the 7 Macedonian section labels + hrefs + `CLUB_NAME` (VERIFIED "ФК Беласица", 1.06b/D-1.06b-2)
+- `components/site/site-header.tsx` — sticky masthead + section nav (desktop bar / mobile drawer); `activeHref` prop; verified `CLUB_NAME` wordmark + crest via `next/image` (`/crest.svg`) with a client `onError` fallback to the placeholder shield badge until the asset ships (1.06b/D-1.06b-2)
+- `components/site/site-footer.tsx` — four-column editorial footer (brand + `неофицијална архива` disclaimer · Навигација reusing `NAV_ITEMS` + `Приватност` stub · Контакт · Следете нѐ) over a `© 2026` copyright bar. **⚠️ Контакт + Следете нѐ carry DEMO/fabricated values** (`DEMO_CONTACT`/`DEMO_SOCIAL`, owner-instructed, D-1.06b-1) — launch blocker, tracked in the placeholder register
 - `components/site/results-table.tsx` — `ResultsTable` (typed `MatchResult[]`; outcome-coloured score cell); never invents data
 - `components/site/photo-frame.tsx` — `PhotoFrame` matted historical-photo treatment (grayscale→colour, caption; placeholder panel when no `src`); optional `date` overline prop (1.05.2)
 - `components/home/reveal.tsx` — `Reveal` scroll-in wrapper (client; IntersectionObserver → `.is-visible`; syncs the DOM directly, no React state; instant under reduced-motion / no-JS; reveals above-viewport elements on reload) (1.05.2)
@@ -97,3 +97,4 @@
 - `src/_project-state/completions/Part-1-Phase-1.05-Completion.md` — Phase 1.05 completion report (season archive templates)
 - `src/_project-state/completions/Part-1-Phase-1.06-Completion.md` — Phase 1.06 completion report (people templates: legends, trainers & presidents)
 - `src/_project-state/completions/Part-1-Phase-1.05.2-Completion.md` — Phase 1.05.2 completion report (homepage content-sync + 3 new sections)
+- `src/_project-state/completions/Part-1-Phase-1.06b-Completion.md` — Phase 1.06b completion report (visual polish: sticky masthead, verified name + crest wiring, four-column footer w/ demo data, gallery mosaic)

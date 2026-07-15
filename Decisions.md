@@ -336,3 +336,26 @@
 - **Decision:** On the owner's explicit instruction, merged PR #6 into `main` (`gh pr merge 6 --merge`) **without** the preview review. Mirrors the merge-override precedent (D-1.05-3, D-1.06-6). The executing agent does not merge as a rule — this is a logged, informed owner override.
 - **Consequences:** The homepage ships to `main` (→ Vercel production once the project wiring is fixed). The **preview eyeball check remains owed** (owed-verification register) and should run on the fixed Vercel setup. The Vercel infra drift (stale `.vercel` link; `belasica` → `belasica-v2` rename; branch auto-build off) is a standing follow-up for Lazar.
 - **Links:** [[D-1.06-6]], [[D-1.05-3]], CLAUDE.md §Branch & PR rules.
+
+---
+
+### D-1.06b-1 · 2026-07-15 · DEMO contact + social values added to the footer (owner-instructed, off-content-truth)
+- **Status:** Accepted — owner instruction ("use the demo values"), **informed** (the owner was told this contradicts the content-truth rule before choosing it).
+- **Context:** Phase 1.06b (visual polish) asked to "fill" the footer. CLAUDE.md §Content truth is explicit: *"Nothing is invented — ever … not even as filler to make a page look complete,"* and `facts.md` marks the contact email + social links **UNVERIFIED**. The executor surfaced the conflict and offered honest-placeholder / structure-only alternatives; the owner chose to ship real-looking demo values for the preview.
+- **Decision:** Added a single, loudly-commented `DEMO_CONTACT` (`kontakt@fkbelasica-arhiva.mk`, `+389 70 000 000`) + `DEMO_SOCIAL` (Facebook/Instagram/YouTube → `#`) block at the top of `components/site/site-footer.tsx`, rendered in the new **Контакт** + **Следете нѐ** columns. Every value is fabricated placeholder data, not a fact.
+- **Consequences:** **Launch blocker** — these must be removed or replaced with VERIFIED values (from `facts.md`) before cutover. Tracked in the placeholder register (`current-state.md`). This is a deliberate, logged exception to the "never invent" rule for a preview only; it must not set precedent for content pages.
+- **Links:** [[D-1.06b-2]], [[D-1.05.2-5]], CLAUDE.md §Content truth, `facts.md` (Contact & links).
+
+### D-1.06b-2 · 2026-07-15 · Club name VERIFIED "ФК Беласица"; crest approved (asset owed); D-1.06b ID scheme
+- **Status:** Accepted — owner instruction ("verify & add both").
+- **Context:** The exact club name and a crest asset were UNVERIFIED P3 placeholders (only Lazar/Ace flip that flag): the wordmark rendered `[PLACEHOLDER: club name — P3]` + a placeholder shield badge, and `brand.md` forbids drawing a fake crest. The brief (written against a different "V2" shape) asked to render the real crest + "ФК Беласица". No crest file exists anywhere in the repo/machine.
+- **Decision:** On the owner's instruction, flipped **`facts.md` → club name VERIFIED "ФК Беласица"** (source: owner Lazar, today), superseding the pending-Ace hold. Renamed `CLUB_NAME_PLACEHOLDER` → `CLUB_NAME` and rendered it in the header/footer wordmark; fixed the `app/layout.tsx` metadata title typo (`Белазица` → `ФК Беласица — архива`). Recorded the crest as owner-approved in `facts.md`, but **did not fabricate the asset** — wired the navbar crest via `next/image` (`/crest.svg`, `unoptimized`) with a client `onError` **graceful fallback to the existing placeholder badge**, so it renders the moment the owner commits `public/crest.svg` (+ `app/icon.svg` for the favicon, then delete `app/favicon.ico`). Used the **`D-1.06b-N`** ID scheme for this sub-phase (mirrors `D-1.05.2-*`) because `D-1.06-1..6` are taken.
+- **Consequences:** The club-name placeholder is resolved everywhere (register updated). The **crest asset + favicon swap stays owed** — the code is in place; only the binary file is missing (owner provides it). `brand.md`'s "never draw a fake crest" was honored.
+- **Links:** [[D-1.06b-1]], [[D-1.06b-3]], `facts.md` (Club identity), `brand.md` §Crest usage.
+
+### D-1.06b-3 · 2026-07-15 · Homepage gallery: 2×2 feature mosaic, per-tile captions dropped
+- **Status:** Accepted — executor decision (brief asked for the asymmetric layout; the caption handling was unspecified).
+- **Context:** The brief wanted the first gallery photo to span 2 columns **and** 2 rows with the rest filling around it. `brand.md` places photo captions **below** the frame — which cannot vertically align inside a row-spanning CSS grid (a spanning feature's single caption vs. two rows of captioned tiles never matches, breaking the grid).
+- **Decision:** All gallery tiles are `aspect-square`; the feature (index 0) gets `col-span-2 row-span-2`, so a square at 2-column width aligns to exactly two tile rows. Tiles carry their caption/date as accessible **`alt`** only (no visible `figcaption`); the feature photo is the visual anchor. Robust for any count (one photo → a lone feature).
+- **Consequences:** The homepage gallery no longer shows visible caption/date text (still present in `alt` for assistive tech, and on the season pages). Purely visual, trivially reversible. `PhotoFrame` was left untouched (the span is passed via its existing `className`).
+- **Links:** [[D-1.06b-2]], `brand.md` §Photo frame, `app/page.tsx` (§5 Галерија).

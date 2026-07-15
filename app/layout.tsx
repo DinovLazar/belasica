@@ -19,7 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Белазица — архива",
+  title: "ФК Беласица — архива",
 };
 
 export default function RootLayout({

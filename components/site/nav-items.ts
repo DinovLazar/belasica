@@ -13,6 +13,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Контакт", href: "/kontakt" },
 ];
 
-// Club name is an unverified fact (P3) — never invented. Rendered as a visible
-// placeholder wherever the wordmark would appear until confirmed in facts.md.
-export const CLUB_NAME_PLACEHOLDER = "[PLACEHOLDER: club name — P3]";
+// Club name — VERIFIED by owner Lazar (2026-07-15, facts.md), superseding the
+// pending-Ace P3 placeholder (D-1.06b-2). Rendered as the wordmark everywhere.
+export const CLUB_NAME = "ФК Беласица";
